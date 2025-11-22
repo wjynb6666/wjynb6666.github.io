@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>神铭导航</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            text-align: center;
+        }
+        
+        .container {
+            max-width: 800px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            margin-bottom: 30px;
+            animation: fadeIn 1s ease-out;
+        }
+        
+        .title {
+            font-size: 4rem;
+            font-weight: bold;
+            margin-bottom: 15px;
+            background: linear-gradient(45deg, #ff7e5f, #feb47b);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            text-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            color: #a0a0c0;
+            margin-bottom: 40px;
+        }
+        
+        .buttons-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        
+        .nav-button {
+            background: linear-gradient(135deg, #4a4a8a 0%, #2a2a5a 100%);
+            color: white;
+            border: none;
+            padding: 18px 25px;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+        }
+        
+        .nav-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            background: linear-gradient(135deg, #5a5a9a 0%, #3a3a6a 100%);
+        }
+        
+        .nav-button i {
+            margin-right: 10px;
+            font-size: 1.3rem;
+        }
+        
+        .footer {
+            margin-top: 50px;
+            color: #707090;
+            font-size: 0.9rem;
+            padding: 20px;
+            border-top: 1px solid #2a2a4a;
+            width: 100%;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        /* 响应式设计 */
+        @media (max-width: 600px) {
+            .title {
+                font-size: 2.5rem;
+            }
+            
+            .buttons-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 class="title">神铭导航</h1>
+            <p class="subtitle">永久导航页: smnb6666.github.io</p>
+        </div>
+        
+        <div class="buttons-grid">
+            <a href="https://t.me/shenming778891" class="nav-button" target="_blank">
+                <i class="fab fa-telegram"></i> 神铭主频道
+            </a>
+            
+            <a href="https://t.me/shenming778891" class="nav-button" target="_blank">
+                <i class="fab fa-telegram"></i> 神思汇主频道
+            </a>
+            
+            <a href="https://t.me/+nR1uov7oK3tiNTQ1" class="nav-button" target="_blank">
+                <i class="fas fa-users"></i> 神思汇审核群
+            </a>
+            
+            <a href="https://www.vmcg.cn/shop/WKWY7M2P" class="nav-button" target="_blank">
+                <i class="fas fa-shopping-cart"></i> 神铭主卡网
+            </a>
+            
+            <a href="http://wow.liangzaiapi.xyz/" class="nav-button" target="_blank">
+                <i class="fas fa-globe"></i> 神铭泛滥港V台
+            </a>
+            
+            <a href="t.me/shenming886" class="nav-button" target="_blank">
+                <i class="fas fa-user"></i> 神铭本人账号
+            </a>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>© 2023 神铭导航 | 设计简洁 · 使用便捷</p>
+    </div>
+    
+    <script>
+        // 添加按钮点击动画效果
+        document.querySelectorAll('.nav-button').forEach(button => {
+            button.addEventListener('click', function(e) {
+                // 创建涟漪效果
+                const ripple = document.createElement('span');
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size / 2;
+                const y = e.clientY - rect.top - size / 2;
+                
+                ripple.style.width = ripple.style.height = size + 'px';
+                ripple.style.left = x + 'px';
+                ripple.style.top = y + 'px';
+                ripple.classList.add('ripple');
+                
+                this.appendChild(ripple);
+                
+                setTimeout(() => {
+                    ripple.remove();
+                }, 600);
+            });
+        });
+        
+        // 添加涟漪效果的CSS
+        const style = document.createElement('style');
+        style.textContent = `
+            .ripple {
+                position: absolute;
+                border-radius: 50%;
+                background: rgba(255, 255, 255, 0.3);
+                transform: scale(0);
+                animation: ripple-animation 0.6s linear;
+            }
+            
+            @keyframes ripple-animation {
+                to {
+                    transform: scale(4);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>
