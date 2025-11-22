@@ -73,6 +73,8 @@
             align-items: center;
             justify-content: center;
             text-decoration: none;
+            position: relative;
+            overflow: hidden;
         }
         
         .nav-button:hover {
@@ -100,6 +102,21 @@
             to { opacity: 1; transform: translateY(0); }
         }
         
+        .ripple {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.3);
+            transform: scale(0);
+            animation: ripple-animation 0.6s linear;
+        }
+        
+        @keyframes ripple-animation {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+        
         /* 响应式设计 */
         @media (max-width: 600px) {
             .title {
@@ -123,14 +140,6 @@
         <div class="buttons-grid">
             <a href="https://t.me/shenming778891" class="nav-button" target="_blank">
                 <i class="fab fa-telegram"></i> 神铭主频道
-            </a>
-            
-            <a href="https://t.me/shenming778891" class="nav-button" target="_blank">
-                <i class="fab fa-telegram"></i> 神思汇主频道
-            </a>
-            
-            <a href="https://t.me/+nR1uov7oK3tiNTQ1" class="nav-button" target="_blank">
-                <i class="fas fa-users"></i> 神思汇审核群
             </a>
             
             <a href="https://www.vmcg.cn/shop/WKWY7M2P" class="nav-button" target="_blank">
@@ -174,26 +183,6 @@
                 }, 600);
             });
         });
-        
-        // 添加涟漪效果的CSS
-        const style = document.createElement('style');
-        style.textContent = `
-            .ripple {
-                position: absolute;
-                border-radius: 50%;
-                background: rgba(255, 255, 255, 0.3);
-                transform: scale(0);
-                animation: ripple-animation 0.6s linear;
-            }
-            
-            @keyframes ripple-animation {
-                to {
-                    transform: scale(4);
-                    opacity: 0;
-                }
-            }
-        `;
-        document.head.appendChild(style);
     </script>
 </body>
 </html>
