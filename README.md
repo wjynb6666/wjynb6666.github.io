@@ -1,1 +1,1 @@
-# wjynb6666.github.io
+# smnb6666.github.io
