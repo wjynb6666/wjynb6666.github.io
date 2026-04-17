@@ -31,13 +31,13 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,B
 .ai-pill.purple{background:#f3e8ff;border-color:#d8b4fe;color:#6b21a8}
 .ai-pill.orange{background:#fff7ed;border-color:#fdba74;color:#c2410c;}
 .error{color:#111;padding:10px 0;font-size:16px;}
-.prediction-table{margin-top:16px;width:100%;border-collapse:collapse;font-size:12px; table-layout:fixed;}
-.prediction-table th{background:var(--primary-weak);color:var(--primary);padding:6px 2px;text-align:center;font-weight:600;border:1px solid var(--border); word-break:break-word;}
-.prediction-table td{padding:4px 2px;text-align:center;border:1px solid var(--border); word-break:break-word;}
+.prediction-table{margin-top:16px;width:100%;border-collapse:collapse;font-size:13px; table-layout:fixed;}
+.prediction-table th{background:var(--primary-weak);color:var(--primary);padding:8px 4px;text-align:center;font-weight:600;border:1px solid var(--border); word-break:break-word;}
+.prediction-table td{padding:5px 4px;text-align:center;border:1px solid var(--border); word-break:break-word;}
 .prediction-table .correct{color:var(--success);font-weight:600;}
 .prediction-table .wrong{color:var(--danger);font-weight:600;}
 .table-title{font-weight:700;margin:20px 0 10px 0;font-size:18px;}
-.stats{margin-top:12px;padding:10px;background:var(--primary-weak);border-radius:8px;text-align:center;font-weight:600;color:var(--primary);font-size:13px;}
+.stats{margin-top:12px;padding:10px;background:var(--primary-weak);border-radius:8px;text-align:center;font-weight:600;color:var(--primary);font-size:14px;}
 .monitor-section{margin-top:16px;padding:12px;background:var(--primary-weak);border-radius:8px;}
 .monitor-title{font-weight:700;margin-bottom:8px;color:var(--primary);font-size:16px;}
 .monitor-content{font-size:13px;line-height:1.5;}
@@ -55,7 +55,7 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,B
 .vote-item.active{background:var(--primary);color:white;}
 .vote-item.triple-active{background:var(--purple);color:white;}
 .table-wrapper{overflow-x:auto; -webkit-overflow-scrolling:touch;}
-@media (max-width:768px){.card{padding:10px;}.current .nums{font-size:18px;}.prediction-table{font-size:10px;}.ai-pill{font-size:12px;padding:4px 8px;}}
+@media (max-width:768px){.card{padding:10px;}.current .nums{font-size:18px;}.prediction-table{font-size:11px;}.ai-pill{font-size:12px;padding:4px 8px;}}
 </style>
 </head>
 <body>
@@ -115,7 +115,7 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,B
 <div id="stats" class="stats"></div>
 <div class="table-wrapper">
 <table class="prediction-table">
-<thead><tr><th>期号</th><th>开奖</th><th>杀组</th><th>推荐</th><th>防守</th><th>三组</th><th>单组</th><th>特码</th><th>杀中</th><th>推中</th><th>防中</th><th>三中</th><th>单中</th><th>特中</th></tr></thead>
+<thead><tr><th>期号</th><th>开奖</th><th>杀组</th><th>推荐</th><th>三组</th><th>单组</th><th>特码</th><th>杀组中</th><th>特码中</th></tr></thead>
 <tbody id="prediction-tbody"></tbody>
 </table>
 </div>
@@ -270,14 +270,13 @@ function weightedVote(dataSlice){
     const triple=predictTripleGroup(dataSlice,finalKill);
     const recommendCandidates=ALL_COMBOS.filter(c=>c!==finalKill&&c!==singleGroup);
     const recommend=recommendCandidates.slice(0,2);
-    const defense=ALL_COMBOS.filter(c=>!recommend.includes(c)&&c!==finalKill&&c!==singleGroup).slice(0,2);
     const specArr=[];
     if(predict5y(dataSlice)) specArr.push(predict5y(dataSlice).predSum);
     if(predict3y(dataSlice)) specArr.push(predict3y(dataSlice).predSum);
     specArr.push(13,15,16,9,18,11,14);
     const uniqueSpec=[...new Set(specArr.map(Number).filter(n=>!isNaN(n)))];
     uniqueSpec.sort((a,b)=>a-b);
-    return {killCombo:finalKill,singleGroup,tripleGroup:triple.combos,recommendCombo:recommend.join('+'),defenseCombo:defense.join('+'),specialSumHint:uniqueSpec.slice(0,6).join(','),votes,tripleVotes:triple.votes,y5:predict5y(dataSlice),y3:predict3y(dataSlice),cont:predictContinuous(dataSlice),rev:predictReverse(dataSlice),reg,ai:predictAI(dataSlice)};
+    return {killCombo:finalKill,singleGroup,tripleGroup:triple.combos,recommendCombo:recommend.join('+'),specialSumHint:uniqueSpec.slice(0,6).join(','),votes,tripleVotes:triple.votes,y5:predict5y(dataSlice),y3:predict3y(dataSlice),cont:predictContinuous(dataSlice),rev:predictReverse(dataSlice),reg,ai:predictAI(dataSlice)};
 }
 
 function renderAIPredict(){
@@ -313,45 +312,37 @@ function renderAIPredict(){
 }
 
 function calculateAllAlgorithmsStats(){
-    const tp=Math.min(data.length-12,40);let t=0,w=0,cs=0,sw=0,siw=0,trw=0,rew=0,dew=0;
+    const tp=Math.min(data.length-12,40);let t=0,w=0,cs=0,sw=0;
     for(let i=0;i<tp;i++){if(i+12>=data.length)continue;const wd=data.slice(i+1,i+13);if(wd.length<12)continue;const res=weightedVote(wd);if(!res)continue;
-        const act=tagBySum(sum(data[i].nums));const actSum=sum(data[i].nums);const actCombo=act.combo;
-        if(actCombo!==res.killCombo)w++;t++;
+        const act=tagBySum(sum(data[i].nums));const actSum=sum(data[i].nums);
+        if(act.combo!==res.killCombo)w++;t++;
         if(res.specialSumHint.split(',').map(Number).includes(actSum))sw++;
-        if(actCombo===res.singleGroup)siw++;
-        if(res.tripleGroup.includes(actCombo))trw++;
-        if(res.recommendCombo.split('+').includes(actCombo))rew++;
-        if(res.defenseCombo.split('+').includes(actCombo))dew++;
     }
     for(let i=0;i<tp;i++){if(i+12>=data.length)break;const wd=data.slice(i+1,i+13);if(wd.length<12)continue;const res=weightedVote(wd);if(!res)continue;const act=tagBySum(sum(data[i].nums));if(act.combo!==res.killCombo)cs++;else break;}
-    algorithmStats={total:t,win:w,currentConsecutive:cs,winRate:t>0?(w/t)*100:0,specialWin:sw,specialWinRate:t>0?(sw/t)*100:0,singleWin:siw,singleWinRate:t>0?(siw/t)*100:0,tripleWin:trw,tripleWinRate:t>0?(trw/t)*100:0,recommendWin:rew,recommendWinRate:t>0?(rew/t)*100:0,defenseWin:dew,defenseWinRate:t>0?(dew/t)*100:0};
+    algorithmStats={total:t,win:w,currentConsecutive:cs,winRate:t>0?(w/t)*100:0,specialWin:sw,specialWinRate:t>0?(sw/t)*100:0};
 }
 function updateAlgorithmMonitor(){
     const h=document.getElementById('highest-winrate'),c=document.getElementById('most-consecutive');
     if(algorithmStats.total>0){
-        h.innerHTML=`杀组:${algorithmStats.winRate.toFixed(1)}% | 推荐:${algorithmStats.recommendWinRate.toFixed(1)}% | 防守:${algorithmStats.defenseWinRate.toFixed(1)}% | 三组:${algorithmStats.tripleWinRate.toFixed(1)}% | 单组:${algorithmStats.singleWinRate.toFixed(1)}% | 特码:${algorithmStats.specialWinRate.toFixed(1)}%`;
+        h.innerHTML=`杀组准确率：${algorithmStats.win}/${algorithmStats.total}=${algorithmStats.winRate.toFixed(1)}% | 特码命中：${algorithmStats.specialWinRate.toFixed(1)}%`;
         c.textContent=`当前连中：${algorithmStats.currentConsecutive}期`;
     }else{h.textContent='--';c.textContent='--';}
 }
 function renderPredictionTable(){
     if(data.length<13){document.getElementById('prediction-table-card').style.display='none';return;}
     const tb=document.getElementById('prediction-tbody');tb.innerHTML='';
-    const dc=Math.min(data.length-12,20);let wc=0,tc=0,sh=0,sih=0,trh=0,reh=0,deh=0;
+    const dc=Math.min(data.length-12,20);let wc=0,tc=0,sh=0;
     for(let i=0;i<dc;i++){if(i+12>=data.length)continue;const wd=data.slice(i+1,i+13);if(wd.length<12)continue;const res=weightedVote(wd);if(!res)continue;
         const cd=data[i];const an=cd.nums||[];const as=sum(an);const at=tagBySum(as);const ac=at.combo;
         let kh='',kcl='';if(ac===res.killCombo){kh='❌';kcl='wrong';}else{kh='✅';kcl='correct';wc++;}
         const spHit=res.specialSumHint.split(',').map(Number).includes(as);if(spHit)sh++;
-        const siHit=(ac===res.singleGroup);if(siHit)sih++;
-        const trHit=res.tripleGroup.includes(ac);if(trHit)trh++;
-        const reHit=res.recommendCombo.split('+').includes(ac);if(reHit)reh++;
-        const deHit=res.defenseCombo.split('+').includes(ac);if(deHit)deh++;
         tc++;
         const r=document.createElement('tr');
-        r.innerHTML=`<td>${cd[fieldConfig.periodField]||'--'}</td><td>${an.join('+')}=${as}</td><td>${res.killCombo}</td><td>${res.recommendCombo}</td><td>${res.defenseCombo}</td><td>${res.tripleGroup.join(' ')}</td><td>${res.singleGroup}</td><td>${res.specialSumHint.substring(0,10)}</td><td class="${kcl}">${kh}</td><td>${reHit?'✅':'❌'}</td><td>${deHit?'✅':'❌'}</td><td>${trHit?'✅':'❌'}</td><td>${siHit?'✅':'❌'}</td><td>${spHit?'✅':'❌'}</td>`;
+        r.innerHTML=`<td>${cd[fieldConfig.periodField]||'--'}</td><td>${an.join('+')}=${as}</td><td>${res.killCombo}</td><td>${res.recommendCombo}</td><td>${res.tripleGroup.join(' ')}</td><td>${res.singleGroup}</td><td>${res.specialSumHint.substring(0,12)}</td><td class="${kcl}">${kh}</td><td>${spHit?'✅':'❌'}</td>`;
         tb.appendChild(r);
     }
     if(tc>0){
-        document.getElementById('stats').innerHTML=`杀组:${wc}/${tc}=${((wc/tc)*100).toFixed(1)}% | 推荐:${reh}/${tc}=${((reh/tc)*100).toFixed(1)}% | 防守:${deh}/${tc}=${((deh/tc)*100).toFixed(1)}% | 三组:${trh}/${tc}=${((trh/tc)*100).toFixed(1)}% | 单组:${sih}/${tc}=${((sih/tc)*100).toFixed(1)}% | 特码:${sh}/${tc}=${((sh/tc)*100).toFixed(1)}%`;
+        document.getElementById('stats').innerHTML=`杀组胜率：${wc}/${tc}=${((wc/tc)*100).toFixed(1)}% | 特码命中：${sh}/${tc}=${((sh/tc)*100).toFixed(1)}%`;
     }
     document.getElementById('prediction-table-card').style.display='block';
 }
