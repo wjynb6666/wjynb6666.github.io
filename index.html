@@ -8,7 +8,7 @@
 :root{--bg:#f7f9fc;--card:#ffffff;--text:#1f2937;--muted:#6b7280;--primary:#2563eb;--primary-weak:#e6efff;--border:#e5e7eb;--success:#16a34a;--danger:#ef4444;--warning:#ca8a04;}
 *{box-sizing:border-box}
 body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,"Noto Sans SC","PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;touch-action:pan-y;-webkit-user-select:none;user-select:none;}
-.container{max-width:980px;margin:0 auto;padding:0;}
+.container{max-width:1200px;margin:0 auto;padding:0;}
 .card{background:var(--card);border:1px solid var(--border);border-radius:0;box-shadow:0 8px 20px rgb(16 24 40 / 6%);padding:16px;margin-bottom:1px;}
 .header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
 .logo{font-weight:700;font-size:18px;color:var(--primary);}
@@ -29,9 +29,9 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,B
 .ai-pill.info{background:#e6efff;border-color:#bfdbfe;color:#1e40af}
 .ai-pill.danger{background:#fee2e2;border-color:#fecaca;color:#b91c1c}
 .error{color:#111;padding:10px 0;font-size:16px;}
-.prediction-table{margin-top:16px;width:100%;border-collapse:collapse;font-size:16px;}
-.prediction-table th{background:var(--primary-weak);color:var(--primary);padding:10px 12px;text-align:center;font-weight:600;border:1px solid var(--border);}
-.prediction-table td{padding:8px 10px;text-align:center;border:1px solid var(--border);}
+.prediction-table{margin-top:16px;width:100%;border-collapse:collapse;font-size:14px; table-layout:fixed;}
+.prediction-table th{background:var(--primary-weak);color:var(--primary);padding:8px 4px;text-align:center;font-weight:600;border:1px solid var(--border); word-break:break-word;}
+.prediction-table td{padding:6px 4px;text-align:center;border:1px solid var(--border); word-break:break-word;}
 .prediction-table .correct{color:var(--success);font-weight:600;}
 .prediction-table .wrong{color:var(--danger);font-weight:600;}
 .prediction-table .defense{color:var(--warning);font-weight:600;}
@@ -43,7 +43,9 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,B
 .single-group-box{margin-top:16px;padding:12px;background:linear-gradient(145deg, #fef3c7 0%, #fde68a 100%);border-radius:12px;border-left:6px solid #ca8a04;}
 .single-group-title{font-weight:800;margin-bottom:8px;color:#78350f;font-size:16px;}
 .single-group-content{font-size:16px;font-weight:700;color:#451a03;}
-@media (max-width:768px){.card{padding:12px;}.current .nums{font-size:20px;}.prediction-table{font-size:14px;}}
+/* 表格滚动适应小屏 */
+.table-wrapper{overflow-x:auto; -webkit-overflow-scrolling:touch;}
+@media (max-width:768px){.card{padding:12px;}.current .nums{font-size:20px;}.prediction-table{font-size:12px;}}
 </style>
 </head>
 <body>
@@ -80,12 +82,14 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,B
 </div>
 </div>
 <div class="card" id="prediction-table-card" style="display:none;">
-<div class="table-title">📋 历史反向回测</div>
+<div class="table-title">📋 历史反向回测 (增强版·AI融合)</div>
 <div id="stats" class="stats"></div>
+<div class="table-wrapper">
 <table class="prediction-table">
-<thead><tr><th>期号</th><th>开奖</th><th>推荐组合</th><th>防守组合</th><th>命中情况</th></tr></thead>
+<thead><tr><th>期号</th><th>开奖</th><th>杀号</th><th>推荐</th><th>防守</th><th>单组预测</th><th>特码</th><th>杀中</th><th>特码中</th><th>单组中</th></tr></thead>
 <tbody id="prediction-tbody"></tbody>
 </table>
+</div>
 </div>
 </div>
 <script>
@@ -96,7 +100,7 @@ const fieldConfig={periodField:'expect',numbersField:'opencode',timeField:'opent
 let data=[],nextTime=null,timer=null,isFetching=false;let algorithmStats={};
 document.addEventListener('DOMContentLoaded',init);
 function init(){initializeAlgorithmStats();fetchData();}
-function initializeAlgorithmStats(){algorithmStats={total:0,win:0,currentConsecutive:0,winRate:0};}
+function initializeAlgorithmStats(){algorithmStats={total:0,win:0,currentConsecutive:0,winRate:0,specialWin:0,singleWin:0};}
 function setError(msg){const el=document.getElementById('error');el.textContent=msg;el.style.display='block';}function clearError(){document.getElementById('error').style.display='none';}
 function fetchData(){if(isFetching)return;isFetching=true;clearError();fetch(fieldConfig.apiUrl,{cache:'no-store'}).then(r=>{if(!r.ok)throw new Error('HTTP '+r.status);return r.json();}).then(json=>{data=extractArray(json).slice(0,100).map(item=>({...item,nums:parseNums(item[fieldConfig.numbersField])}));if(!data.length)throw new Error('没有获取到开奖数据');renderCurrent();setupCountdown();renderAIPredict();calculateAllAlgorithmsStats();updateAlgorithmMonitor();renderPredictionTable();isFetching=false;}).catch(e=>{console.error(e);setError('获取数据出错：'+e.message);isFetching=false;});}
 function extractArray(res){if(Array.isArray(res))return res;if(res&&typeof res==='object'){const keys=['data','items','list','results','records'];for(const k of keys){if(Array.isArray(res[k]))return res[k];}for(const k in res){if(Array.isArray(res[k]))return res[k];}}return[];}
@@ -116,130 +120,102 @@ const Y5_MAP = {
     '5y3': [3,8,13,18,23],
     '5y4': [4,9,14,19,24]
 };
-
 function getY5Group(sumValue) {
-    for (let [group, arr] of Object.entries(Y5_MAP)) {
-        if (arr.includes(sumValue)) return group;
-    }
+    for (let [group, arr] of Object.entries(Y5_MAP)) if(arr.includes(sumValue)) return group;
     return null;
 }
-
-// 根据和值获取大小单双 (严格按照规则)
 function getComboBySum(sumVal) {
-    if (sumVal <= 13) {
-        return sumVal % 2 === 0 ? '小双' : '小单';
-    } else {
-        return sumVal % 2 === 0 ? '大双' : '大单';
-    }
+    if (sumVal <= 13) return sumVal % 2 === 0 ? '小双' : '小单';
+    else return sumVal % 2 === 0 ? '大双' : '大单';
 }
-
-// 5y预测: 杀组合 (基于最近一期5y组, 找同组上一期和值, 运算得预测和值, 取其组合为杀)
 function predict5yKill(dataSlice) {
     if (!dataSlice || dataSlice.length < 2) return null;
-    const latest = dataSlice[0];
-    const latestSum = sum(latest.nums);
-    const latestGroup = getY5Group(latestSum);
+    const latest = dataSlice[0]; const latestSum = sum(latest.nums); const latestGroup = getY5Group(latestSum);
     if (!latestGroup) return null;
-    
-    // 在历史中找上一个同5y组的和值 (从索引1开始)
     let prevSameGroupSum = null;
     for (let i = 1; i < dataSlice.length; i++) {
         const s = sum(dataSlice[i].nums);
-        if (getY5Group(s) === latestGroup) {
-            prevSameGroupSum = s;
-            break;
-        }
+        if (getY5Group(s) === latestGroup) { prevSameGroupSum = s; break; }
     }
     if (prevSameGroupSum === null) return null;
-    
-    let predSum = latestSum + prevSameGroupSum;
-    if (predSum > 27) predSum -= 27;
+    let predSum = latestSum + prevSameGroupSum; if (predSum > 27) predSum -= 27;
     const predCombo = getComboBySum(predSum);
-    // 5y杀法: 杀预测组合的对立面? 按示例: 预测大单杀小双 => 实际杀与预测相反的组合?
-    // 根据描述: "25是大单，大单杀小双" => 预测组合为大单, 杀小双. 即杀预测组合的"对立"组合
     const killMap = {'大单':'小双','小双':'大单','大双':'小单','小单':'大双'};
-    const killCombo = killMap[predCombo] || predCombo;
-    return { predSum, predCombo, killCombo, latestGroup, prevSum: prevSameGroupSum };
+    return { predSum, predCombo, killCombo: killMap[predCombo]||predCombo, latestGroup, prevSum: prevSameGroupSum };
 }
 
-// ========== 回归率分析 (单组预测) ==========
-// 计算每个组合的遗漏期数，若某组合长期未回归，则预测单组为该组合
+// ========== AI增强回归率 + 多重校验 ==========
 function regressionSinglePrediction(dataSlice) {
-    const combos = ['小单','小双','大单','大双'];
-    const missing = {};
-    for (let c of combos) {
-        let miss = 0;
-        for (let i = 0; i < dataSlice.length; i++) {
-            const s = sum(dataSlice[i].nums);
-            const combo = getComboBySum(s);
-            if (combo === c) break;
-            miss++;
-        }
-        missing[c] = miss;
-    }
-    // 找出遗漏最大的组合 (最需回归)
-    let maxMiss = -1, target = '';
-    for (let c of combos) {
-        if (missing[c] > maxMiss) {
-            maxMiss = missing[c];
-            target = c;
-        }
-    }
-    // 回归率阈值: 如果最大遗漏 > 5 期, 强烈预测回归
-    const confidence = maxMiss >= 5 ? '极高' : (maxMiss >= 3 ? '中等' : '一般');
+    const combos = ['小单','小双','大单','大双']; const missing = {};
+    for (let c of combos) { let miss=0; for (let i=0;i<dataSlice.length;i++) { if(getComboBySum(sum(dataSlice[i].nums))===c) break; miss++; } missing[c]=miss; }
+    let maxMiss=-1, target='';
+    for (let c of combos) if(missing[c]>maxMiss) { maxMiss=missing[c]; target=c; }
+    const confidence = maxMiss>=5?'极高':(maxMiss>=3?'中等':'一般');
     return { targetCombo: target, missing: maxMiss, confidence };
 }
 
-// ========== 多重算法融合 (确保100%准确) ==========
+// 反向因果(精简)
+function calculateReverseCausalityModel(dataSlice) {
+    if (!dataSlice || dataSlice.length < 12) return null;
+    const window12 = dataSlice.slice(0, 12); let comboWeight={'小单':0,'大双':0,'小双':0,'大单':0};
+    let missingBai6=0,missingGe4=0; let foundB6=false,foundG4=false;
+    for (let i=0;i<data.length;i++){const item=data[i];if(!item.nums||item.nums.length<3)continue;const bai=item.nums[0],ge=item.nums[2];if(!foundB6&&bai===6){foundB6=true;missingBai6=i;}if(!foundG4&&ge===4){foundG4=true;missingGe4=i;}if(foundB6&&foundG4)break;}
+    if(!foundB6)missingBai6=45;if(!foundG4)missingGe4=42;
+    const recent6=window12.slice(0,6).map(item=>tagBySum(sum(item.nums)).combo);
+    const older6=window12.slice(6,12).map(item=>tagBySum(sum(item.nums)).combo);
+    const countCombo=(arr)=>({'小单':arr.filter(c=>c==='小单').length,'大双':arr.filter(c=>c==='大双').length,'小双':arr.filter(c=>c==='小双').length,'大单':arr.filter(c=>c==='大单').length});
+    const recentCnt=countCombo(recent6); const olderCnt=countCombo(older6); const trend={}; for(let c in recentCnt)trend[c]=recentCnt[c]-olderCnt[c];
+    const sumList=window12.map(item=>sum(item.nums)); const avgSum=sumList.reduce((a,b)=>a+b,0)/sumList.length; const sumTrend=sumList[0]-avgSum;
+    const coldBoost=(m)=>m>30?18:(m>20?12:(m>10?6:0));
+    comboWeight['小单']=85+(trend['小单']*5)+(coldBoost(missingBai6)*1.5)+(coldBoost(missingGe4)*1.3)+(sumTrend<-1?8:0);
+    comboWeight['大双']=80+(trend['大双']*4)+(olderCnt['大双']===0&&recentCnt['大双']<=1?20:0)+(sumTrend>1?10:0);
+    comboWeight['小双']=78+(trend['小双']*6)+(recentCnt['小双']<=1?12:0);
+    comboWeight['大单']=70-(recentCnt['大单']>=3?15:0)-(trend['大单']>1?10:0);
+    for(let k in comboWeight)comboWeight[k]=Math.max(25,Math.min(135,comboWeight[k]));
+    const sorted=Object.entries(comboWeight).sort((a,b)=>a[1]-b[1]); const killCombo=sorted[0][0];
+    let recommend=[],defense=[];
+    if(killCombo==='大单'){recommend=['大双','小单'];defense=['小双'];}
+    else if(killCombo==='小双'){recommend=['小单','大双'];defense=['大单'];}
+    else if(killCombo==='大双'){recommend=['大单','小双'];defense=['小单'];}
+    else{recommend=['小双','大单'];defense=['大双'];}
+    const specialSums='13,15,16,9,18,11,14';
+    return {killResult:`杀${killCombo}`,recommendCombo:recommend.join('+'),defenseCombo:defense.join('+'),specialSumHint:specialSums};
+}
+
+// ========== AI终极融合 (增强特码智能) ==========
 function calculateUltimatePrediction(dataSlice) {
     if (!dataSlice || dataSlice.length < 12) return null;
-    
-    // 1. 反向因果模型 (保留, 用于辅助)
     const reverseResult = calculateReverseCausalityModel(dataSlice);
-    
-    // 2. 5y算法预测杀号
     const y5 = predict5yKill(dataSlice);
-    
-    // 3. 回归率单组预测
     const regression = regressionSinglePrediction(dataSlice);
     
-    // 4. 综合决策: 单组预测 = 回归率目标 (因为回归率是最强信号)
-    //    杀号 = 融合5y杀号 + 反向因果杀号 (取交集或最强)
-    let finalKill = '';
-    if (y5 && reverseResult) {
-        // 如果5y杀号与反向因果杀号一致, 则采用; 否则采用回归率指向的对立面?
-        const y5Kill = y5.killCombo;
-        const revKill = reverseResult.killResult.replace('杀','');
-        if (y5Kill === revKill) finalKill = y5Kill;
-        else finalKill = y5Kill;  // 5y优先 (实战验证)
-    } else if (y5) {
-        finalKill = y5.killCombo;
-    } else if (reverseResult) {
-        finalKill = reverseResult.killResult.replace('杀','');
-    } else {
-        finalKill = '小双';
-    }
-    
-    // 单组最终预测 = 回归目标 (如果回归目标与杀号冲突, 仍以回归目标为准, 因为回归率是100%准确的单组预测)
+    // 杀号决策: 5y优先 > 反向因果
+    let finalKill = y5 ? y5.killCombo : (reverseResult ? reverseResult.killResult.replace('杀','') : '小双');
     const singleGroup = regression.targetCombo;
     
-    // 推荐/防守组合 (基于单组与杀号)
-    let recommend = [], defense = [];
-    const allCombos = ['小单','小双','大单','大双'];
-    const others = allCombos.filter(c => c !== singleGroup && c !== finalKill);
+    // 推荐/防守
+    let recommend=[], defense=[finalKill];
+    const allCombos=['小单','小双','大单','大双'];
+    const others = allCombos.filter(c => c!==singleGroup && c!==finalKill);
     recommend = others.slice(0,2);
-    defense = [finalKill];  // 防守杀号组合
     
-    // 特码 (融合5y预测和值)
+    // ** AI智能特码增强 **: 基于遗漏、5y预测、和尾趋势
     let specialSums = reverseResult ? reverseResult.specialSumHint : '13,15,16,9';
     if (y5) {
         specialSums = `${y5.predSum},` + specialSums;
+        // 添加5y组内其他和值作为候选
+        const groupVals = Y5_MAP[y5.latestGroup] || [];
+        specialSums += ',' + groupVals.filter(v=>v!==y5.predSum).slice(0,2).join(',');
     }
+    // 去重排序
+    let sumArr = [...new Set(specialSums.split(',').map(Number).filter(n=>!isNaN(n)))];
+    sumArr.sort((a,b)=>a-b);
+    specialSums = sumArr.slice(0,6).join(',');
     
     return {
         killCombo: finalKill,
         singleGroup: singleGroup,
-        regressionDetail: `遗漏${regression.missing}期 · 置信度${regression.confidence}`,
+        regressionDetail: `遗漏${regression.missing}期·${regression.confidence}`,
         recommendCombo: recommend.join('+'),
         defenseCombo: defense.join('+'),
         specialSumHint: specialSums,
@@ -248,40 +224,7 @@ function calculateUltimatePrediction(dataSlice) {
     };
 }
 
-// 原反向因果 (保留)
-function calculateReverseCausalityModel(dataSlice) {
-    if (!dataSlice || dataSlice.length < 12) return null;
-    const window12 = dataSlice.slice(0, 12);
-    let comboWeight = { '小单':0, '大双':0, '小双':0, '大单':0 };
-    let missingBai6=0,missingGe4=0;
-    let foundB6=false,foundG4=false;
-    for (let i=0;i<data.length;i++){const item=data[i];if(!item.nums||item.nums.length<3)continue;const bai=item.nums[0],ge=item.nums[2];if(!foundB6&&bai===6){foundB6=true;missingBai6=i;}if(!foundG4&&ge===4){foundG4=true;missingGe4=i;}if(foundB6&&foundG4)break;}
-    if(!foundB6)missingBai6=45;if(!foundG4)missingGe4=42;
-    const recent6=window12.slice(0,6).map(item=>tagBySum(sum(item.nums)).combo);
-    const older6=window12.slice(6,12).map(item=>tagBySum(sum(item.nums)).combo);
-    const countCombo=(arr)=>({'小单':arr.filter(c=>c==='小单').length,'大双':arr.filter(c=>c==='大双').length,'小双':arr.filter(c=>c==='小双').length,'大单':arr.filter(c=>c==='大单').length});
-    const recentCnt=countCombo(recent6);const olderCnt=countCombo(older6);
-    const trend={};for(let c in recentCnt)trend[c]=recentCnt[c]-olderCnt[c];
-    const sumList=window12.map(item=>sum(item.nums));const avgSum=sumList.reduce((a,b)=>a+b,0)/sumList.length;
-    const sumTrend=sumList[0]-avgSum;
-    const coldBoost=(m)=>m>30?18:(m>20?12:(m>10?6:0));
-    comboWeight['小单']=85+(trend['小单']*5)+(coldBoost(missingBai6)*1.5)+(coldBoost(missingGe4)*1.3)+(sumTrend<-1?8:0);
-    comboWeight['大双']=80+(trend['大双']*4)+(olderCnt['大双']===0&&recentCnt['大双']<=1?20:0)+(sumTrend>1?10:0);
-    comboWeight['小双']=78+(trend['小双']*6)+(recentCnt['小双']<=1?12:0);
-    comboWeight['大单']=70-(recentCnt['大单']>=3?15:0)-(trend['大单']>1?10:0);
-    for(let k in comboWeight)comboWeight[k]=Math.max(25,Math.min(135,comboWeight[k]));
-    const sorted=Object.entries(comboWeight).sort((a,b)=>a[1]-b[1]);
-    const killCombo=sorted[0][0];
-    let recommend=[],defense=[];
-    if(killCombo==='大单'){recommend=['大双','小单'];defense=['小双'];}
-    else if(killCombo==='小双'){recommend=['小单','大双'];defense=['大单'];}
-    else if(killCombo==='大双'){recommend=['大单','小双'];defense=['小单'];}
-    else{recommend=['小双','大单'];defense=['大双'];}
-    const specialSums=[13,15,16,9,18,11,14].join(',');
-    return {predictionCombo:`杀号：${killCombo}`,killResult:`杀${killCombo}`,recommendCombo:recommend.join('+'),defenseCombo:defense.join('+'),specialSumHint:specialSums};
-}
-
-// 渲染AI (含单组)
+// 渲染AI
 function renderAIPredict() {
     try {
         if (!data.length || data.length < 12) { document.getElementById('ai').style.display = 'none'; return; }
@@ -300,31 +243,52 @@ function renderAIPredict() {
     } catch(e) { console.error(e); }
 }
 
-// 统计 (基于融合模型)
+// 统计 (包含特码/单组)
 function calculateAllAlgorithmsStats() {
     const testPeriods = Math.min(data.length - 12, 40);
-    let total=0,win=0,consecutive=0;
-    for(let i=0;i<testPeriods;i++){if(i+12>=data.length)continue;const winData=data.slice(i+1,i+13);if(winData.length<12)continue;const res=calculateUltimatePrediction(winData);if(!res)continue;const actual=tagBySum(sum(data[i].nums));const isCorrect=(actual.combo!==res.killCombo);total++;if(isCorrect)win++;}
-    for(let i=0;i<testPeriods;i++){if(i+12>=data.length)break;const winData=data.slice(i+1,i+13);if(winData.length<12)continue;const res=calculateUltimatePrediction(winData);if(!res)continue;const actual=tagBySum(sum(data[i].nums));if(actual.combo!==res.killCombo)consecutive++;else break;}
-    algorithmStats.total=total;algorithmStats.win=win;algorithmStats.currentConsecutive=consecutive;algorithmStats.winRate=total>0?(win/total)*100:0;
+    let total=0,win=0,consecutive=0, specialWin=0, singleWin=0;
+    for(let i=0;i<testPeriods;i++){if(i+12>=data.length)continue;const winData=data.slice(i+1,i+13);if(winData.length<12)continue;const res=calculateUltimatePrediction(winData);if(!res)continue;
+        const actual=tagBySum(sum(data[i].nums)); const actualSum = sum(data[i].nums);
+        const isCorrect=(actual.combo!==res.killCombo); total++; if(isCorrect) win++;
+        // 特码中?
+        const specArr = res.specialSumHint.split(',').map(Number);
+        if(specArr.includes(actualSum)) specialWin++;
+        // 单组中?
+        if(actual.combo === res.singleGroup) singleWin++;
+    }
+    for(let i=0;i<testPeriods;i++){if(i+12>=data.length)break;const winData=data.slice(i+1,i+13);if(winData.length<12)continue;const res=calculateUltimatePrediction(winData);if(!res)continue;const actual=tagBySum(sum(data[i].nums));if(actual.combo!==res.killCombo) consecutive++; else break;}
+    algorithmStats.total=total; algorithmStats.win=win; algorithmStats.currentConsecutive=consecutive; 
+    algorithmStats.winRate=total>0?(win/total)*100:0;
+    algorithmStats.specialWinRate = total>0?(specialWin/total)*100:0;
+    algorithmStats.singleWinRate = total>0?(singleWin/total)*100:0;
 }
 function updateAlgorithmMonitor(){
     const h=document.getElementById('highest-winrate'),c=document.getElementById('most-consecutive');
-    if(algorithmStats.total>0){h.textContent=`当前准确率：${algorithmStats.win}/${algorithmStats.total}=${algorithmStats.winRate.toFixed(1)}%`;c.textContent=`当前连中：${algorithmStats.currentConsecutive}期`;}
-    else{h.textContent='当前准确率：--';c.textContent='当前连中：--';}
+    if(algorithmStats.total>0){
+        h.textContent = `杀号准确率：${algorithmStats.win}/${algorithmStats.total}=${algorithmStats.winRate.toFixed(1)}% | 特码命中：${algorithmStats.specialWinRate.toFixed(1)}% | 单组命中：${algorithmStats.singleWinRate.toFixed(1)}%`;
+        c.textContent=`当前连中：${algorithmStats.currentConsecutive}期`;
+    } else { h.textContent='当前准确率：--'; c.textContent='当前连中：--'; }
 }
+
+// 渲染历史表格 (增强列)
 function renderPredictionTable(){
     if(data.length<13){document.getElementById('prediction-table-card').style.display='none';return;}
     const tbody=document.getElementById('prediction-tbody');tbody.innerHTML='';
-    const displayCount=Math.min(data.length-12,30);let winCount=0,totalCount=0;
+    const displayCount=Math.min(data.length-12, 25); // 减少显示行数以适应高度
+    let winCount=0,totalCount=0, specHit=0, singleHit=0;
     for(let i=0;i<displayCount;i++){if(i+12>=data.length)continue;const winData=data.slice(i+1,i+13);if(winData.length<12)continue;const res=calculateUltimatePrediction(winData);if(!res)continue;
-        const curData=data[i];const actualNums=curData.nums||[];const actualSum=sum(actualNums);const actualTag=tagBySum(actualSum);
-        let hit='',cls='';if(actualTag.combo===res.killCombo){hit='杀组错误';cls='wrong';}
-        else{const rec=res.recommendCombo.split('+');const def=res.defenseCombo.split('+');if(rec.includes(actualTag.combo)){hit='中推荐';cls='correct';}else if(def.includes(actualTag.combo)){hit='中防守';cls='defense';}else{hit='未命中';cls='';}}
-        if(hit!=='杀组错误')winCount++;totalCount++;
-        const row=document.createElement('tr');row.innerHTML=`<td>${curData[fieldConfig.periodField]||'--'}</td><td>${actualNums.length?actualNums.join('+')+'='+actualSum:'--'}</td><td>${res.recommendCombo}</td><td>${res.defenseCombo}</td><td class="${cls}">${hit}</td>`;tbody.appendChild(row);
+        const curData=data[i]; const actualNums=curData.nums||[]; const actualSum=sum(actualNums); const actualTag=tagBySum(actualSum);
+        let killHit='', killCls=''; if(actualTag.combo===res.killCombo){killHit='❌'; killCls='wrong';} else {killHit='✅'; killCls='correct'; winCount++;}
+        const specArr = res.specialSumHint.split(',').map(Number); const specHitFlag = specArr.includes(actualSum); if(specHitFlag) specHit++;
+        const singleHitFlag = (actualTag.combo === res.singleGroup); if(singleHitFlag) singleHit++;
+        totalCount++;
+        const row=document.createElement('tr');
+        row.innerHTML=`<td>${curData[fieldConfig.periodField]||'--'}</td><td>${actualNums.join('+')}=${actualSum}</td><td>${res.killCombo}</td><td>${res.recommendCombo}</td><td>${res.defenseCombo}</td><td>${res.singleGroup}</td><td>${res.specialSumHint.substring(0,12)}</td><td class="${killCls}">${killHit}</td><td>${specHitFlag?'✅':'❌'}</td><td>${singleHitFlag?'✅':'❌'}</td>`;
+        tbody.appendChild(row);
     }
-    if(totalCount>0){document.getElementById('stats').textContent=`杀号模型胜率：${winCount}/${totalCount}=${((winCount/totalCount)*100).toFixed(1)}%`;}
+    if(totalCount>0){
+        document.getElementById('stats').innerHTML = `杀号胜率：${winCount}/${totalCount}=${((winCount/totalCount)*100).toFixed(1)}% | 特码命中：${specHit}/${totalCount}=${((specHit/totalCount)*100).toFixed(1)}% | 单组命中：${singleHit}/${totalCount}=${((singleHit/totalCount)*100).toFixed(1)}%`;
+    }
     document.getElementById('prediction-table-card').style.display='block';
 }
 </script>
