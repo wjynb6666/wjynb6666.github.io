@@ -30,11 +30,9 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,B
 .ai-pill.danger{background:#fee2e2;border-color:#fecaca;color:#b91c1c}
 .ai-pill.purple{background:#f3e8ff;border-color:#d8b4fe;color:#6b21a8}
 .error{color:#111;padding:10px 0;font-size:16px;}
-
-/* 表格样式 - 允许换行 */
-.prediction-table{margin-top:16px;width:100%;border-collapse:collapse;font-size:12px;table-layout:auto;word-wrap:break-word;word-break:break-all;}
+.prediction-table{margin-top:16px;width:100%;border-collapse:collapse;font-size:13px;table-layout:fixed;}
 .prediction-table th{background:var(--primary-weak);color:var(--primary);padding:8px 4px;text-align:center;font-weight:600;border:1px solid var(--border);}
-.prediction-table td{padding:6px 4px;text-align:center;border:1px solid var(--border);word-wrap:break-word;word-break:break-all;white-space:normal;}
+.prediction-table td{padding:5px 4px;text-align:center;border:1px solid var(--border);}
 .prediction-table .correct{color:var(--success);font-weight:600;}
 .prediction-table .wrong{color:var(--danger);font-weight:600;}
 .table-title{font-weight:700;margin:20px 0 10px 0;font-size:18px;}
@@ -55,8 +53,8 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,B
 .vote-item{flex:1;text-align:center;padding:4px;border-radius:8px;font-size:11px;background:#f1f5f9;}
 .vote-item.active{background:var(--primary);color:white;}
 .vote-item.triple-active{background:var(--purple);color:white;}
-.table-wrapper{overflow-x:auto;-webkit-overflow-scrolling:touch;width:100%;}
-@media (max-width:768px){.card{padding:10px;}.current .nums{font-size:18px;}.prediction-table{font-size:10px;}.ai-pill{font-size:12px;padding:4px 8px;}}
+.table-wrapper{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+@media (max-width:768px){.card{padding:10px;}.current .nums{font-size:18px;}.prediction-table{font-size:11px;}.ai-pill{font-size:12px;padding:4px 8px;}}
 </style>
 </head>
 <body>
@@ -115,7 +113,9 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,B
 <div id="stats" class="stats"></div>
 <div class="table-wrapper">
 <table class="prediction-table">
-<thead><tr><th>期号</th><th>开奖</th><th>杀组</th><th>推荐</th><th>三组</th><th>单组</th><th>特码</th><th>杀组中</th><th>特码中</th></tr></thead>
+<thead><tr><th>期号</th>
+<th>开奖</th><th>杀组</th><th>推荐</th><th>三组</th><th>单组</th><th>特码</th>
+<th>杀组中</th><th>特码中</th></tr></thead>
 <tbody id="prediction-tbody"></tbody>
 </table>
 </div>
@@ -145,7 +145,11 @@ function fetchData(){
     }).catch(e=>{console.error(e);setError('出错：'+e.message);fetching=false;});
 }
 
-function extractArray(r){if(Array.isArray(r))return r;if(r&&typeof r==='object')for(let k of['data','items','list','results','records'])if(Array.isArray(r[k]))return r[k];return[];}
+function extractArray(r){
+    if(Array.isArray(r))return r;
+    if(r&&typeof r==='object')for(let k of['data','items','list','results','records'])if(Array.isArray(r[k]))return r[k];
+    return[];
+}
 function parseNums(s){if(!s)return[];return String(s).split(CFG.sep).map(v=>v.trim()).filter(Boolean).map(n=>parseInt(n,10)||0);}
 function sum(a){return a.reduce((x,y)=>x+y,0);}
 function tagBySum(t){return{size:t>=14?'大':'小',oe:t%2===0?'双':'单',combo:(t>=14?'大':'小')+(t%2===0?'双':'单')};}
@@ -153,6 +157,7 @@ function getCombo(s){return s<=13?(s%2?'小单':'小双'):(s%2?'大单':'大双'
 const ALL=['小单','小双','大单','大双'];
 const KILL={'大单':'小双','小双':'大单','大双':'小单','小单':'大双'};
 
+// ========== 深度优化算法 ==========
 const Y5={0:[5,10,15,20,25],1:[6,11,16,21,26],2:[7,12,17,22,27],3:[3,8,13,18,23],4:[4,9,14,19,24]};
 const Y3={0:[0,3,6,9,12,15,18,21,24,27],1:[1,4,7,10,13,16,19,22,25],2:[2,5,8,11,14,17,20,23,26]};
 const Y7={0:[0,7,14,21],1:[1,8,15,22],2:[2,9,16,23],3:[3,10,17,24],4:[4,11,18,25],5:[5,12,19,26],6:[6,13,20,27]};
@@ -239,7 +244,7 @@ function renderCurrent(){
     document.getElementById('cur-time').textContent=fmtTime(latest[CFG.time]);
 }
 function fmtTime(s){
-    try{if(typeof s==='string'&&s.includes('-')&&s.includes(':')){let now=new Date(),[md,hms]=s.split(' '),[M,D]=md.split('-').map(Number),[hh,mm,ss]=hms.split(':').map(Number),pad=n=>String(n).padStart(2,'0');return`${pad(M)}-${pad(D)} ${pad(hh)}:${pad(mm)}:${pad(ss)}`;}let ts=Number(s);if(!isNaN(ts)){let d=new Date(ts>1e12?ts:ts*1000),pad=n=>String(n).padStart(2,'0');return`${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;}}catch(e){}return'-- --:--:--';}
+    try{if(typeof s==='string'&&s.includes('-')&&s.includes(':')){let now=new Date(),[md,hms]=s.split(' '),[M,D]=md.split('-').map(Number),[hh,mm,ss]=hms.split(':').map(Number),pad=n=>String(n).padStart(2,'0');return`${pad(M)}-${pad(D)} ${pad(hh)}:${pad(mm)}:${pad(ss)}`;}let ts=Number(s);if(!isNaN(ts)){let d=new Date(ts>1e12?ts:ts*1000),pad=n=>String(n).padStart(2,'0');return`${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;}}catch(e){}return'-- --:--:--';
 }
 function setupCountdown(){
     if(timer)clearInterval(timer);let latest=data[0],ts=latest[CFG.time],t=null;
@@ -265,23 +270,14 @@ function renderTable(){
         let r=weightedVote(wd);
         if(!r)continue;
         let cd=data[i],an=cd.nums||[],as=sum(an),at=tagBySum(as),ac=at.combo;
-        let kh=ac!==r.kill?'✅':'❌',kcl=ac!==r.kill?'correct':'wrong';
-        if(ac!==r.kill)wc++;
+        let kh='',kcl='';
+        if(ac===r.kill){kh='❌';kcl='wrong';}else{kh='✅';kcl='correct';wc++;}
         let spHit=r.spec.split(',').map(Number).includes(as);if(spHit)sh++;
         tc++;
         let row=document.createElement('tr');
-        // 允许单元格内容自动换行
-        row.innerHTML=`
-            <td>${cd[CFG.period]||'--'}</td>
-            <td>${an.join('+')}=${as}</td>
-            <td>${r.kill}</td>
-            <td>${r.rec}</td>
-            <td>${r.triple.join(' ')}</td>
-            <td>${r.single}</td>
-            <td>${r.spec}</td>
-            <td class="${kcl}">${kh}</td>
-            <td>${spHit?'✅':'❌'}</td>
-        `;
+        let tripleStr=r.triple.join(' ');
+        let specStr=r.spec.length>12?r.spec.substring(0,10)+'..':r.spec;
+        row.innerHTML=`<td>${cd[CFG.period]||'--'}</td><td>${an.join('+')}=${as}</td><td>${r.kill}</td><td>${r.rec}</td><td>${tripleStr}</td><td>${r.single}</td><td>${specStr}</td><td class="${kcl}">${kh}</td><td>${spHit?'✅':'❌'}</td>`;
         tb.appendChild(row);
     }
     if(tc>0){
