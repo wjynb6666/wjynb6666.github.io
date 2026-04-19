@@ -43,7 +43,7 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,B
 .prediction-table th:nth-child(4),.prediction-table td:nth-child(4){width:70px;min-width:70px;}
 .prediction-table th:nth-child(5),.prediction-table td:nth-child(5){width:85px;min-width:85px;}
 .prediction-table th:nth-child(6),.prediction-table td:nth-child(6){width:50px;min-width:50px;}
-.prediction-table th:nth-child(7),.prediction-table td:nth-child(7){width:90px;min-width:90px;word-break:break-all;white-space:normal;line-height:1.4;}
+.prediction-table th:nth-child(7),.prediction-table td:nth-child(7){width:110px;min-width:110px;word-break:break-all;white-space:normal;line-height:1.4;}
 .prediction-table th:nth-child(8),.prediction-table td:nth-child(8){width:50px;min-width:50px;}
 .prediction-table th:nth-child(9),.prediction-table td:nth-child(9){width:50px;min-width:50px;}
 
@@ -87,7 +87,7 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,B
 <span id="ai-nextperiod" class="ai-pill warn">📅预测期数：--</span>
 <span id="ai-kill-combo" class="ai-pill danger">🎯终极杀组：--</span>
 <span id="ai-recommend-combo" class="ai-pill success">✅推荐组合：--</span>
-<span id="ai-special-sum" class="ai-pill info" style="background:#fef3c7;border-color:#fde68a;color:#92400e;">🔢特码(6个)：--</span>
+<span id="ai-special-sum" class="ai-pill info" style="background:#fef3c7;border-color:#fde68a;color:#92400e;">🔢特码：--</span>
 </div>
 <div class="triple-group-box">
 <div class="group-title triple-group-title">🎲 三组预测 · AI加权锁定 (自动避杀)</div>
@@ -127,7 +127,7 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,B
 <div id="stats" class="stats"></div>
 <div class="table-wrapper">
 <table class="prediction-table">
-<thead><tr><th>期号</th><th>开奖</th><th>杀组</th><th>推荐</th><th>三组</th><th>单组</th><th>特码(6)</th><th>杀组中</th><th>特码中</th></tr></thead>
+<thead><tr><th>期号</th><th>开奖</th><th>杀组</th><th>推荐</th><th>三组</th><th>单组</th><th>特码(6码)</th><th>杀组中</th><th>特码中</th></tr></thead>
 <tbody id="prediction-tbody"></tbody>
 </table>
 </div>
@@ -182,95 +182,93 @@ function getY5(s){for(let[k,v]of Object.entries(Y5))if(v.includes(s))return k;re
 function getY3(s){for(let[k,v]of Object.entries(Y3))if(v.includes(s))return k;return null;}
 function getY7(s){for(let[k,v]of Object.entries(Y7))if(v.includes(s))return k;return null;}
 
-// ==================== 十维算法 ====================
+// 1. 5y预测
 function pred5y(d){if(!d||d.length<2)return null;let s=sum(d[0].nums),g=getY5(s);if(g==null)return null;let p=null;for(let i=1;i<d.length;i++){let ps=sum(d[i].nums);if(getY5(ps)===g){p=ps;break;}}if(p==null)return null;let pred=s+p;if(pred>27)pred-=27;let c=getCombo(pred);return{kill:KILL[c]||c,conf:8,reason:`5y${g}→${pred}`,pred};}
+// 2. 3y预测
 function pred3y(d){if(!d||d.length<2)return null;let s=sum(d[0].nums),g=getY3(s);if(g==null)return null;let p=null;for(let i=1;i<d.length;i++){let ps=sum(d[i].nums);if(getY3(ps)===g){p=ps;break;}}if(p==null)return null;let pred=s+p;if(pred>27)pred-=27;let c=getCombo(pred);return{kill:KILL[c]||c,conf:7,reason:`3y${g}→${pred}`,pred};}
+// 3. 7y预测
 function pred7y(d){if(!d||d.length<2)return null;let s=sum(d[0].nums),g=getY7(s);if(g==null)return null;let p=null;for(let i=1;i<d.length;i++){let ps=sum(d[i].nums);if(getY7(ps)===g){p=ps;break;}}if(p==null)return null;let pred=s+p;if(pred>27)pred-=27;let c=getCombo(pred);return{kill:KILL[c]||c,conf:6,reason:`7y${g}→${pred}`,pred};}
+// 4. 连续形态
 function predCont(d){if(!d||d.length<4)return null;let r=d.slice(0,10).map(x=>getCombo(sum(x.nums))),last=r[0];let trans={'大单':['大双','大单','小单'],'小双':['小单','小双','大双'],'大双':['大单','大双','小双'],'小单':['小双','小单','大单']};let freq={};ALL.forEach(c=>freq[c]=r.filter(x=>x===c).length);let target=KILL[last];if(freq[target]>=3){let possible=trans[last]||[],alt=possible.filter(c=>c!==last).sort((a,b)=>freq[a]-freq[b])[0];target=KILL[alt]||target;}return{kill:target,conf:6,reason:`${last}→杀${target}`};}
+// 5. 反向因果
 function predRev(d){if(!d||d.length<12)return null;let w=d.slice(0,12),cw={};ALL.forEach(c=>cw[c]=0);let mb6=0,mg4=0,fb6=false,fg4=false;for(let i=0;i<data.length;i++){let it=data[i];if(!it.nums||it.nums.length<3)continue;if(!fb6&&it.nums[0]===6){fb6=true;mb6=i;}if(!fg4&&it.nums[2]===4){fg4=true;mg4=i;}if(fb6&&fg4)break;}if(!fb6)mb6=45;if(!fg4)mg4=42;let r6=w.slice(0,6).map(i=>tagBySum(sum(i.nums)).combo),o6=w.slice(6,12).map(i=>tagBySum(sum(i.nums)).combo);let cnt=a=>{let o={};ALL.forEach(c=>o[c]=a.filter(x=>x===c).length);return o;};let rc=cnt(r6),oc=cnt(o6);let sl=w.map(i=>sum(i.nums)),avg=sl.reduce((a,b)=>a+b,0)/sl.length,st=sl[0]-avg;let cb=m=>m>30?22:(m>20?15:(m>10?9:0));cw['小单']=95+(rc['小单']-oc['小单'])*7+cb(mb6)*2+cb(mg4)*1.7+(st<-1?12:0);cw['大双']=88+(rc['大双']-oc['大双'])*6+(oc['大双']===0&&rc['大双']<=1?25:0)+(st>1?14:0);cw['小双']=82+(rc['小双']-oc['小双'])*8+(rc['小双']<=1?18:0);cw['大单']=70-(rc['大单']>=3?20:0)-((rc['大单']-oc['大单'])>1?14:0);ALL.forEach(c=>cw[c]=Math.max(20,Math.min(145,cw[c])));let sorted=Object.entries(cw).sort((a,b)=>a[1]-b[1]);return{kill:sorted[0][0],conf:5,reason:`能量${sorted[0][1].toFixed(0)}`};}
+// 6. 回归率
 function predReg(d){if(!d||d.length<5)return null;let miss={};ALL.forEach(c=>{let m=0;for(let i=0;i<d.length;i++){if(getCombo(sum(d[i].nums))===c)break;m++;}miss[c]=m;});let max=-1,target='';ALL.forEach(c=>{if(miss[c]>max){max=miss[c];target=c;}});return{kill:KILL[target]||target,conf:max>=7?7:(max>=5?6:5),reason:`漏${max}期→${target}`,target,missing:max};}
+// 7. AI增强
 function predAI(d){if(!d||d.length<10)return null;let sums=d.slice(0,16).map(x=>sum(x.nums)),combos=sums.map(s=>getCombo(s));let avg=sums.reduce((a,b)=>a+b,0)/sums.length,trend=sums[0]-avg;let odd=sums.filter(s=>s%2===1).length,big=sums.filter(s=>s>=14).length;let freq={};ALL.forEach(c=>freq[c]=combos.filter(x=>x===c).length);let scores={};ALL.forEach(c=>scores[c]=0);if(trend>3.5)scores['大双']+=12;else if(trend<-3.5)scores['小单']+=12;else if(trend>2)scores['大双']+=7;else if(trend<-2)scores['小单']+=7;if(odd>9)scores['大单']+=10;else if(odd<4)scores['小双']+=10;if(big>9)scores['大双']+=9;else if(big<3)scores['小单']+=9;ALL.forEach(c=>scores[c]+=(16-freq[c])*2.5);let sorted=Object.entries(scores).sort((a,b)=>b[1]-a[1]);let target=sorted[0][0];return{kill:KILL[target]||target,conf:7,reason:`AI:${target}(${sorted[0][1].toFixed(0)})`};}
+// 8. 马尔可夫链
 function predMarkov(d){if(!d||d.length<8)return null;let combos=d.slice(0,20).map(x=>getCombo(sum(x.nums)));let trans={};ALL.forEach(c=>{trans[c]={};ALL.forEach(n=>trans[c][n]=0);});for(let i=0;i<combos.length-1;i++){let cur=combos[i],nxt=combos[i+1];trans[cur][nxt]++;}ALL.forEach(c=>{let total=Object.values(trans[c]).reduce((a,b)=>a+b,0);if(total>0)ALL.forEach(n=>trans[c][n]/=total);});let last=combos[0],nextProb=trans[last]||{};let sorted=Object.entries(nextProb).sort((a,b)=>b[1]-a[1]);let mostLikely=sorted[0]?sorted[0][0]:last;return{kill:KILL[mostLikely]||KILL[last],conf:5,reason:`马尔→${mostLikely}`};}
+// 9. 波动率预测
 function predWave(d){if(!d||d.length<6)return null;let sums=d.slice(0,12).map(x=>sum(x.nums));let diffs=[];for(let i=0;i<sums.length-1;i++)diffs.push(Math.abs(sums[i]-sums[i+1]));let avgDiff=diffs.reduce((a,b)=>a+b,0)/diffs.length;let lastDiff=Math.abs(sums[0]-sums[1]);let combos=sums.slice(0,8).map(s=>getCombo(s));let freq={};ALL.forEach(c=>freq[c]=combos.filter(x=>x===c).length);let target='';if(lastDiff>avgDiff*1.5)target=Object.entries(freq).sort((a,b)=>a[1]-b[1])[0][0];else target=Object.entries(freq).sort((a,b)=>b[1]-a[1])[0][0];return{kill:KILL[target]||target,conf:6,reason:`波动${lastDiff>avgDiff?'大':'小'}`};}
+// 10. 频率统计算法
 function predFreq(d){if(!d||d.length<3)return null;let recent=d.slice(0,3);let sums=recent.map(r=>sum(r.nums));let groups=sums.map(s=>getCombo(s));let counts={};ALL.forEach(g=>counts[g]=0);groups.forEach(g=>{if(counts.hasOwnProperty(g))counts[g]++;});let kill;if(new Set(groups).size===1){kill=KILL[groups[0]]||groups[0];}else{let minCount=Math.min(...Object.values(counts));let candidates=ALL.filter(g=>counts[g]===minCount);if(candidates.length>1)candidates.sort((a,b)=>groups.lastIndexOf(b)-groups.lastIndexOf(a));kill=candidates[0];}return{kill:kill,conf:6,reason:`频率:${groups.join('→')}`};}
 
-// ==================== 特码智能评分系统 ====================
-function generateSpecialCodes(d, killCombo, recommendCombos){
-    // 初始化0~27所有和值的评分
-    let scores=Array(28).fill(0);
+// 特码加权投票算法 (优化版)
+function weightedSpecialVote(d, killCombo, recComboStr) {
+    let candidates = [];
+    // 收集各算法预测值
+    const preds = [pred5y(d), pred3y(d), pred7y(d), predAI(d), predWave(d), predFreq(d)].filter(p=>p!==null);
+    const weights = {pred5y:9, pred3y:8, pred7y:7, predAI:8, predWave:6, predFreq:7};
+    let voteMap = new Map();
     
-    // 1. 5y预测和值 (+8分)
-    let y5=pred5y(d); if(y5&&y5.pred>=0&&y5.pred<=27) scores[y5.pred]+=8;
-    
-    // 2. 3y预测和值 (+7分)
-    let y3=pred3y(d); if(y3&&y3.pred>=0&&y3.pred<=27) scores[y3.pred]+=7;
-    
-    // 3. 7y预测和值 (+6分)
-    let y7=pred7y(d); if(y7&&y7.pred>=0&&y7.pred<=27) scores[y7.pred]+=6;
-    
-    // 4. 推荐组合的和值范围 (+5分)
-    recommendCombos.split('+').forEach(g=>{
-        if(FORM_RANGES[g]) FORM_RANGES[g].forEach(v=>{if(v>=0&&v<=27) scores[v]+=5;});
+    preds.forEach(p => {
+        if(p.pred !== undefined && !isExtremeNumber(p.pred)) {
+            let w = weights[p.constructor?.name] || 5;
+            voteMap.set(p.pred, (voteMap.get(p.pred)||0) + w);
+        }
     });
     
-    // 5. 近期热号 (+3分，近5期内出现过的和值)
-    let recentSums=d.slice(0,5).map(x=>sum(x.nums));
-    recentSums.forEach(s=>{if(s>=0&&s<=27) scores[s]+=3;});
+    // 从推荐组合范围中抽取热门值
+    const recGroups = recComboStr.split('+');
+    recGroups.forEach(g => {
+        if(FORM_RANGES[g]) {
+            FORM_RANGES[g].slice(0,4).forEach(v => {
+                if(!isExtremeNumber(v)) voteMap.set(v, (voteMap.get(v)||0) + 6);
+            });
+        }
+    });
     
-    // 6. 长期冷号 (+4分，近20期未出现的和值)
-    let allSums=d.slice(0,20).map(x=>sum(x.nums));
-    for(let i=0;i<=27;i++){
-        if(!allSums.includes(i)) scores[i]+=4;
+    // 加入近期高频和值 (最近8期)
+    const recentSums = d.slice(0,8).map(x=>sum(x.nums)).filter(v=>!isExtremeNumber(v));
+    recentSums.forEach(v => voteMap.set(v, (voteMap.get(v)||0) + 4));
+    
+    // 避免杀组对应的和值范围 (弱化)
+    const avoidRange = FORM_RANGES[killCombo] || [];
+    // 转换为数组并排序，过滤极端值，并考虑杀组范围减分
+    let entries = Array.from(voteMap.entries()).map(([val, score]) => {
+        if(avoidRange.includes(parseInt(val))) score *= 0.3; // 降低杀组区间权重
+        return {val: parseInt(val), score};
+    });
+    
+    // 确保安全区间加成
+    entries = entries.map(e => {
+        if(isSafeNumber(e.val)) e.score *= 1.3;
+        return e;
+    });
+    
+    entries.sort((a,b) => b.score - a.score);
+    // 取前6个不重复的值
+    let top6 = entries.slice(0,6).map(e => e.val);
+    // 如果不足6个，从所有有效范围补充
+    if(top6.length < 6) {
+        const allValid = [...new Set([].concat(...Object.values(FORM_RANGES)))].filter(v=>!isExtremeNumber(v) && !avoidRange.includes(v));
+        for(let v of allValid) {
+            if(!top6.includes(v)) top6.push(v);
+            if(top6.length>=6) break;
+        }
     }
-    
-    // 7. 单组预测的和值范围 (+4分)
-    let reg=predReg(d);
-    if(reg&&reg.target&&FORM_RANGES[reg.target]){
-        FORM_RANGES[reg.target].forEach(v=>{if(v>=0&&v<=27) scores[v]+=4;});
-    }
-    
-    // 8. 杀组对立面的和值范围 (+3分)
-    let opposite=Object.keys(KILL).find(k=>KILL[k]===killCombo);
-    if(opposite&&FORM_RANGES[opposite]){
-        FORM_RANGES[opposite].forEach(v=>{if(v>=0&&v<=27) scores[v]+=3;});
-    }
-    
-    // 9. 高频和值基础分 (13~16区间+2分)
-    [13,14,15,16].forEach(v=>{if(v>=0&&v<=27) scores[v]+=2;});
-    
-    // 10. 避免极端值惩罚 (-5分)
-    for(let i=0;i<=2;i++) scores[i]-=5;
-    for(let i=25;i<=27;i++) scores[i]-=5;
-    
-    // 按评分排序，取前6个
-    let ranked=[];
-    for(let i=0;i<=27;i++) ranked.push({value:i,score:scores[i]});
-    ranked.sort((a,b)=>b.score-a.score);
-    
-    return ranked.slice(0,6).map(item=>item.value).sort((a,b)=>a-b);
+    return top6.sort((a,b)=>a-b).join(',');
 }
 
 function predTriple(d,kill){
     let votes={};ALL.forEach(c=>votes[c]=0);
-    if(d.length>=4){
-        let r=d.slice(0,10).map(x=>getCombo(sum(x.nums))),last=r[0];
-        let trans={'大单':['大双','大单','小单'],'小双':['小单','小双','大双'],'大双':['大单','大双','小双'],'小单':['小双','小单','大单']};
-        (trans[last]||ALL).forEach(c=>{if(c!==kill)votes[c]+=6;});
-    }
-    let reg=predReg(d);
-    if(reg&&reg.target!==kill)votes[reg.target]+=(reg.missing>=7?8:(reg.missing>=5?7:6));
-    if(d.length>=10){
-        let sums=d.slice(0,14).map(x=>sum(x.nums)),avg=sums.reduce((a,b)=>a+b,0)/sums.length,trend=sums[0]-avg,odd=sums.filter(s=>s%2===1).length;
-        if(trend>3&&'大双'!==kill)votes['大双']+=7;
-        else if(trend<-3&&'小单'!==kill)votes['小单']+=7;
-        if(odd>8&&'大单'!==kill)votes['大单']+=6;
-        else if(odd<4&&'小双'!==kill)votes['小双']+=6;
-    }
-    let y5=pred5y(d); if(y5){let rec=Object.keys(KILL).find(k=>KILL[k]===y5.kill); if(rec&&rec!==kill)votes[rec]+=7;}
-    let y3=pred3y(d); if(y3){let rec=Object.keys(KILL).find(k=>KILL[k]===y3.kill); if(rec&&rec!==kill)votes[rec]+=6;}
-    let freq=predFreq(d); if(freq){let rec=Object.keys(KILL).find(k=>KILL[k]===freq.kill); if(rec&&rec!==kill)votes[rec]+=5;}
-    let recent=d.slice(0,14).map(x=>getCombo(sum(x.nums))),freqCnt={};
-    ALL.forEach(c=>freqCnt[c]=recent.filter(x=>x===c).length);
+    if(d.length>=4){let r=d.slice(0,10).map(x=>getCombo(sum(x.nums))),last=r[0];let trans={'大单':['大双','大单','小单'],'小双':['小单','小双','大双'],'大双':['大单','大双','小双'],'小单':['小双','小单','大单']};(trans[last]||ALL).forEach(c=>{if(c!==kill)votes[c]+=6;});}
+    let reg=predReg(d);if(reg&&reg.target!==kill)votes[reg.target]+=(reg.missing>=7?8:(reg.missing>=5?7:6));
+    if(d.length>=10){let sums=d.slice(0,14).map(x=>sum(x.nums)),avg=sums.reduce((a,b)=>a+b,0)/sums.length,trend=sums[0]-avg,odd=sums.filter(s=>s%2===1).length;if(trend>3&&'大双'!==kill)votes['大双']+=7;else if(trend<-3&&'小单'!==kill)votes['小单']+=7;if(odd>8&&'大单'!==kill)votes['大单']+=6;else if(odd<4&&'小双'!==kill)votes['小双']+=6;}
+    let y5=pred5y(d);if(y5){let rec=Object.keys(KILL).find(k=>KILL[k]===y5.kill);if(rec&&rec!==kill)votes[rec]+=7;}
+    let y3=pred3y(d);if(y3){let rec=Object.keys(KILL).find(k=>KILL[k]===y3.kill);if(rec&&rec!==kill)votes[rec]+=6;}
+    let freq=predFreq(d);if(freq){let rec=Object.keys(KILL).find(k=>KILL[k]===freq.kill);if(rec&&rec!==kill)votes[rec]+=5;}
+    let recent=d.slice(0,14).map(x=>getCombo(sum(x.nums))),freqCnt={};ALL.forEach(c=>freqCnt[c]=recent.filter(x=>x===c).length);
     ALL.forEach(c=>{if(c!==kill)votes[c]+=(14-freqCnt[c])*1.5;});
     let sorted=Object.entries(votes).filter(([c])=>c!==kill).sort((a,b)=>b[1]-a[1]);
     let triple=sorted.slice(0,3).map(([c])=>c);
@@ -286,12 +284,11 @@ function weightedVote(d){
     let reg=predReg(d),single=reg?Object.keys(KILL).find(k=>KILL[k]===reg.kill):ALL[0];
     let triple=predTriple(d,kill);
     let rec=ALL.filter(c=>c!==kill&&c!==single).slice(0,2);
+    let recStr = rec.join('+');
+    // 调用加权特码投票
+    let spec = weightedSpecialVote(d, kill, recStr);
     
-    // 使用智能评分系统生成6个特码
-    let recStr=rec.join('+');
-    let spec=generateSpecialCodes(d, kill, recStr);
-    
-    return{kill,single,triple:triple.combos,rec:recStr,spec:spec.join(','),votes,tVotes:triple.votes,y5:pred5y(d),y3:pred3y(d),y7:pred7y(d),cont:predCont(d),rev:predRev(d),reg,ai:predAI(d),markov:predMarkov(d),wave:predWave(d),freq:predFreq(d)};
+    return{kill,single,triple:triple.combos,rec:recStr,spec,votes,tVotes:triple.votes,y5:pred5y(d),y3:pred3y(d),y7:pred7y(d),cont:predCont(d),rev:predRev(d),reg,ai:predAI(d),markov:predMarkov(d),wave:predWave(d),freq:predFreq(d)};
 }
 
 function renderAI(){
@@ -301,7 +298,7 @@ function renderAI(){
         if(r){
             document.getElementById('ai-kill-combo').textContent=`🎯终极杀组：${r.kill}`;
             document.getElementById('ai-recommend-combo').textContent=`✅推荐组合：${r.rec}`;
-            document.getElementById('ai-special-sum').textContent=`🔢特码(6个)：${r.spec}`;
+            document.getElementById('ai-special-sum').textContent=`🔢特码：${r.spec}`;
             document.getElementById('single-group-result').textContent=`🔥 单组锁定：${r.single}`;
             document.getElementById('triple-group-result').textContent=`🎲 三组锁定：${r.triple.join(' · ')}`;
             let regDet=r.reg?`遗漏${r.reg.missing}期`:'--';
@@ -350,13 +347,50 @@ function renderCurrent(){
     document.getElementById('cur-time').textContent=fmtTime(latest[CFG.time]);
 }
 function fmtTime(s){
-    try{if(typeof s==='string'&&s.includes('-')&&s.includes(':')){let now=new Date(),[md,hms]=s.split(' '),[M,D]=md.split('-').map(Number),[hh,mm,ss]=hms.split(':').map(Number),pad=n=>String(n).padStart(2,'0');return`${pad(M)}-${pad(D)} ${pad(hh)}:${pad(mm)}:${pad(ss)}`;}let ts=Number(s);if(!isNaN(ts)){let d=new Date(ts>1e12?ts:ts*1000),pad=n=>String(n).padStart(2,'0');return`${pad(d.getMonth()+1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;}}catch(e){}return'-- --:--:--';}
+    try{
+        // 处理格式: "04-20 15:30:45" 或时间戳
+        if(typeof s==='string' && s.includes('-') && s.includes(':')){
+            let parts = s.split(' ');
+            if(parts.length>=2){
+                let datePart = parts[0]; // MM-DD
+                let timePart = parts[1]; // HH:MM:SS
+                return `${datePart} ${timePart}`;
+            }
+        }
+        let ts = Number(s);
+        if(!isNaN(ts)){
+            let d = new Date(ts>1e12?ts:ts*1000);
+            let M = String(d.getMonth()+1).padStart(2,'0');
+            let D = String(d.getDate()).padStart(2,'0');
+            let h = String(d.getHours()).padStart(2,'0');
+            let m = String(d.getMinutes()).padStart(2,'0');
+            let sec = String(d.getSeconds()).padStart(2,'0');
+            return `${M}-${D} ${h}:${m}:${sec}`;
+        }
+    }catch(e){}
+    return s || '-- --:--:--';
 }
 function setupCountdown(){
-    if(timer)clearInterval(timer);let latest=data[0],ts=latest[CFG.time],t=null;
-    try{if(typeof ts==='string'&&ts.includes('-')&&ts.includes(':')){let now=new Date(),[md,hms]=ts.split(' '),[M,D]=md.split('-').map(Number),[hh,mm,ss]=hms.split(':').map(Number);t=new Date(now.getFullYear(),M-1,D,hh,mm,ss);}else{let n=Number(ts);t=new Date(n>1e12?n:n*1000);}}catch(e){}
-    if(!t){document.getElementById('cd').style.display='none';return;}
-    nextTime=new Date(t.getTime()+3*60*1000+30*1000);document.getElementById('cd').style.display='block';tick();timer=setInterval(tick,1000);
+    if(timer)clearInterval(timer);
+    let latest=data[0],ts=latest[CFG.time];
+    let t=null;
+    try{
+        if(typeof ts==='string' && ts.includes('-') && ts.includes(':')){
+            let now=new Date();
+            let [md,hms] = ts.split(' ');
+            let [M,D] = md.split('-').map(Number);
+            let [hh,mm,ss] = hms.split(':').map(Number);
+            t = new Date(now.getFullYear(), M-1, D, hh, mm, ss);
+        } else {
+            let n = Number(ts);
+            t = new Date(n>1e12?n:n*1000);
+        }
+    }catch(e){}
+    if(!t || isNaN(t.getTime())){ document.getElementById('cd').style.display='none'; return; }
+    nextTime = new Date(t.getTime() + 3*60*1000 + 30*1000);
+    document.getElementById('cd').style.display='block';
+    tick();
+    timer = setInterval(tick, 1000);
 }
 function tick(){
     let now=new Date(),diff=nextTime-now,el=document.getElementById('cd'),txt=document.getElementById('cd-txt');
@@ -378,7 +412,9 @@ function renderTable(){
         let cd=data[i],an=cd.nums||[],as=sum(an),at=tagBySum(as),ac=at.combo;
         let kh=ac!==r.kill?'✅':'❌',kcl=ac!==r.kill?'correct':'wrong';
         if(ac!==r.kill)wc++;
-        let spHit=r.spec.split(',').map(Number).includes(as);if(spHit)sh++;
+        let specArr = r.spec.split(',').map(Number);
+        let spHit = specArr.includes(as); 
+        if(spHit)sh++;
         tc++;
         let row=document.createElement('tr');
         row.innerHTML=`
@@ -403,6 +439,5 @@ function renderTable(){
     }
 }
 </script>
-<script defer src="https://static.cloudflareinsights.com/beacon.min.js/v8c78df7c7c0f484497ecbca7046644da1771523124516" integrity="sha512-8DS7rgIrAmghBFwoOTujcf6D9rXvH8xm8JQ1Ja01h9QX8EzXldiszufYa4IFfKdLUKTTrnSFXLDkUEOTrZQ8Qg==" data-cf-beacon='{"version":"2024.11.0","token":"f05c6ba029764a72bbf8a7ac686120ea","r":1,"server_timing":{"name":{"cfCacheStatus":true,"cfEdge":true,"cfExtPri":true,"cfL4":true,"cfOrigin":true,"cfSpeedBrain":true},"location_startswith":null}}' crossorigin="anonymous"></script>
 </body>
 </html>
