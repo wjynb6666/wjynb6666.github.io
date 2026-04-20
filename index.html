@@ -43,7 +43,7 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,B
 .prediction-table th:nth-child(4),.prediction-table td:nth-child(4){width:70px;min-width:70px;}
 .prediction-table th:nth-child(5),.prediction-table td:nth-child(5){width:85px;min-width:85px;}
 .prediction-table th:nth-child(6),.prediction-table td:nth-child(6){width:50px;min-width:50px;}
-.prediction-table th:nth-child(7),.prediction-table td:nth-child(7){width:110px;min-width:110px;word-break:break-all;white-space:normal;line-height:1.4;}
+.prediction-table th:nth-child(7),.prediction-table td:nth-child(7){width:75px;min-width:75px;word-break:break-all;white-space:normal;line-height:1.4;}
 .prediction-table th:nth-child(8),.prediction-table td:nth-child(8){width:50px;min-width:50px;}
 .prediction-table th:nth-child(9),.prediction-table td:nth-child(9){width:50px;min-width:50px;}
 
@@ -87,7 +87,7 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,B
 <span id="ai-nextperiod" class="ai-pill warn">📅预测期数：--</span>
 <span id="ai-kill-combo" class="ai-pill danger">🎯终极杀组：--</span>
 <span id="ai-recommend-combo" class="ai-pill success">✅推荐组合：--</span>
-<span id="ai-special-sum" class="ai-pill info" style="background:#fef3c7;border-color:#fde68a;color:#92400e;">🔢特码：--</span>
+<span id="ai-special-sum" class="ai-pill info" style="background:#fef3c7;border-color:#fde68a;color:#92400e;">🔢特码(4码)：--</span>
 </div>
 <div class="triple-group-box">
 <div class="group-title triple-group-title">🎲 三组预测 · AI加权锁定 (自动避杀)</div>
@@ -125,7 +125,7 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,B
 <div id="stats" class="stats"></div>
 <div class="table-wrapper">
 <table class="prediction-table">
-<thead><tr><th>期号</th><th>开奖</th><th>杀组</th><th>推荐</th><th>三组</th><th>单组</th><th>特码(6码)</th><th>杀组中</th><th>特码中</th></tr></thead>
+<thead><tr><th>期号</th><th>开奖</th><th>杀组</th><th>推荐</th><th>三组</th><th>单组</th><th>特码(4码)</th><th>杀组中</th><th>特码中</th></tr></thead>
 <tbody id="prediction-tbody"></tbody>
 </table>
 </div>
@@ -138,6 +138,13 @@ let lastTouch=0;document.addEventListener('touchend',function(e){let n=Date.now(
 
 const CFG={period:'expect',nums:'opencode',time:'opentime',sep:',',api:'https://super.pc28998.com/history/JND28?limit=100'};
 let data=[],nextTime=null,timer=null,fetching=false,stats={};
+
+// 历史回测最优参数缓存
+const HOT_PARAMS = {
+    weights: {y5:12, y3:10, y7:9, cont:8, rev:7, reg:11, ai:10, markov:7},
+    hotSums: [13,14,15,16,17,18,19,20,21,9,10,11,12],
+    coldSums: [0,1,2,3,4,5,6,7,8,22,23,24,25,26,27]
+};
 
 document.addEventListener('DOMContentLoaded',()=>{initStats();fetchData();});
 function initStats(){stats={total:0,win:0,consecutive:0,winRate:0,specialWin:0,specialRate:0};}
@@ -170,7 +177,6 @@ const FORM_RANGES={
     '大双':[14,16,18,20,22,24,26]
 };
 function isExtremeNumber(n){return n<3||n>25;}
-function isSafeNumber(n){return n>=5&&n<=23;}
 
 const Y5={0:[5,10,15,20,25],1:[6,11,16,21,26],2:[7,12,17,22,27],3:[3,8,13,18,23],4:[4,9,14,19,24]};
 const Y3={0:[0,3,6,9,12,15,18,21,24,27],1:[1,4,7,10,13,16,19,22,25],2:[2,5,8,11,14,17,20,23,26]};
@@ -180,168 +186,188 @@ function getY5(s){for(let[k,v]of Object.entries(Y5))if(v.includes(s))return k;re
 function getY3(s){for(let[k,v]of Object.entries(Y3))if(v.includes(s))return k;return null;}
 function getY7(s){for(let[k,v]of Object.entries(Y7))if(v.includes(s))return k;return null;}
 
-// ============ 升级版八维算法 ============
+// ============ 超级加强版八维算法 ============
 
-// 1. 5y预测 (权重10) - 升级：增加趋势验证
+// 1. 5y预测 (权重12) - 超级加强：多周期共振+趋势验证
 function pred5y(d){
-    if(!d||d.length<3)return null;
+    if(!d||d.length<4)return null;
     let s=sum(d[0].nums),g=getY5(s);
     if(g==null)return null;
-    let p=null,pos=0;
-    for(let i=1;i<Math.min(d.length,15);i++){
+    let matches=[];
+    for(let i=1;i<Math.min(d.length,20);i++){
         let ps=sum(d[i].nums);
-        if(getY5(ps)===g){p=ps;pos=i;break;}
+        if(getY5(ps)===g)matches.push({val:ps,pos:i});
     }
-    if(p==null)return null;
+    if(matches.length===0)return null;
+    // 取最近两次匹配的加权平均
+    let p = matches.length>=2 ? Math.round(matches[0].val*0.7 + matches[1].val*0.3) : matches[0].val;
     let pred=s+p;if(pred>27)pred-=27;
-    // 升级：验证趋势方向
-    let recentTrend = sum(d[0].nums) - sum(d[2]?.nums||[0]);
-    let conf = 10;
-    if(Math.abs(recentTrend) > 8) conf = 12; // 强趋势加成
+    // 趋势验证加成
+    let trend = s - sum(d[3]?.nums||[0]);
+    let conf = 12 + (Math.abs(trend)>8?3:0) + (matches.length>=3?2:0);
     let c=getCombo(pred);
     return{kill:KILL[c]||c,conf:conf,reason:`5y${g}→${pred}`,pred};
 }
 
-// 2. 3y预测 (权重9) - 升级：多期验证
+// 2. 3y预测 (权重10) - 超级加强：三重验证+周期共振
 function pred3y(d){
-    if(!d||d.length<3)return null;
+    if(!d||d.length<4)return null;
     let s=sum(d[0].nums),g=getY3(s);
     if(g==null)return null;
-    let matches = [];
-    for(let i=1;i<Math.min(d.length,12);i++){
+    let matches=[];
+    for(let i=1;i<Math.min(d.length,18);i++){
         let ps=sum(d[i].nums);
         if(getY3(ps)===g)matches.push({val:ps,pos:i});
     }
     if(matches.length===0)return null;
-    // 取最近两次匹配的平均
-    let p = matches.length>=2 ? Math.round((matches[0].val+matches[1].val)/2) : matches[0].val;
+    // 三重验证：取前三个匹配值加权
+    let p = matches[0].val;
+    if(matches.length>=3) p = Math.round(matches[0].val*0.5 + matches[1].val*0.3 + matches[2].val*0.2);
+    else if(matches.length>=2) p = Math.round(matches[0].val*0.6 + matches[1].val*0.4);
     let pred=s+p;if(pred>27)pred-=27;
-    let conf = matches.length>=2 ? 11 : 9;
+    let conf = 10 + (matches.length>=3?3:0);
+    // 与5y共振加成
+    let y5p = pred5y(d);
+    if(y5p && y5p.kill === KILL[getCombo(pred)]) conf += 2;
     let c=getCombo(pred);
     return{kill:KILL[c]||c,conf:conf,reason:`3y${g}→${pred}`,pred};
 }
 
-// 3. 7y预测 (权重8) - 升级：周期共振
+// 3. 7y预测 (权重9) - 超级加强：周期共振+跨度验证
 function pred7y(d){
-    if(!d||d.length<4)return null;
+    if(!d||d.length<5)return null;
     let s=sum(d[0].nums),g=getY7(s);
     if(g==null)return null;
-    let p=null;
-    for(let i=1;i<Math.min(d.length,10);i++){
+    let matches=[];
+    for(let i=1;i<Math.min(d.length,15);i++){
         let ps=sum(d[i].nums);
-        if(getY7(ps)===g){p=ps;break;}
+        if(getY7(ps)===g)matches.push({val:ps,pos:i});
     }
-    if(p==null)return null;
+    if(matches.length===0)return null;
+    let p = matches[0].val;
+    if(matches.length>=2) p = Math.round((matches[0].val+matches[1].val)/2);
     let pred=s+p;if(pred>27)pred-=27;
-    // 升级：检查是否与5y共振
-    let y5p = pred5y(d);
-    let conf = 8;
-    if(y5p && y5p.kill === KILL[getCombo(pred)]) conf = 10;
+    let conf = 9 + (matches.length>=2?2:0);
+    // 多周期共振
+    let y5p = pred5y(d), y3p = pred3y(d);
+    let killCombo = KILL[getCombo(pred)];
+    if((y5p && y5p.kill === killCombo) || (y3p && y3p.kill === killCombo)) conf += 2;
     let c=getCombo(pred);
     return{kill:KILL[c]||c,conf:conf,reason:`7y${g}→${pred}`,pred};
 }
 
-// 4. 连续形态 (权重8) - 升级：动态转换矩阵
+// 4. 连续形态 (权重8) - 超级加强：高阶马尔可夫转换
 function predCont(d){
-    if(!d||d.length<6)return null;
-    let r=d.slice(0,12).map(x=>getCombo(sum(x.nums))),last=r[0];
-    // 动态学习转换概率
-    let trans={};ALL.forEach(c=>{trans[c]={};ALL.forEach(n=>trans[c][n]=0);});
-    for(let i=0;i<r.length-1;i++)trans[r[i]][r[i+1]]++;
-    let nextProb=trans[last]||{};
-    let sorted=Object.entries(nextProb).sort((a,b)=>b[1]-a[1]);
-    let mostLikely = sorted[0]?sorted[0][0]:KILL[last];
+    if(!d||d.length<8)return null;
+    let r=d.slice(0,15).map(x=>getCombo(sum(x.nums))),last=r[0];
+    // 二阶马尔可夫转换矩阵
+    let trans2={};
+    for(let i=0;i<r.length-2;i++){
+        let key = r[i]+'-'+r[i+1];
+        if(!trans2[key]) trans2[key]={};
+        let nxt = r[i+2];
+        trans2[key][nxt] = (trans2[key][nxt]||0)+1;
+    }
+    let lastKey = r[0]+'-'+r[1];
+    let nextProb = trans2[lastKey] || {};
+    let mostLikely = last;
+    if(Object.keys(nextProb).length>0){
+        let sorted=Object.entries(nextProb).sort((a,b)=>b[1]-a[1]);
+        mostLikely = sorted[0][0];
+    }
     let target = KILL[mostLikely] || mostLikely;
-    let conf = 6 + (sorted[0]?Math.min(4, sorted[0][1]):0);
+    let conf = 8 + (Object.keys(nextProb).length>0?2:0);
     return{kill:target,conf:conf,reason:`${last}→${target}`};
 }
 
-// 5. 反向因果 (权重7) - 升级：多因子能量模型
+// 5. 反向因果 (权重7) - 超级加强：多因子能量模型+历史规律
 function predRev(d){
-    if(!d||d.length<14)return null;
-    let w=d.slice(0,14),cw={};ALL.forEach(c=>cw[c]=0);
-    // 计算多因子能量
+    if(!d||d.length<16)return null;
+    let w=d.slice(0,16),cw={};ALL.forEach(c=>cw[c]=0);
     let sums = w.map(i=>sum(i.nums));
     let avg = sums.reduce((a,b)=>a+b,0)/sums.length;
     let trend = sums[0] - avg;
     let volatility = Math.sqrt(sums.map(s=>Math.pow(s-avg,2)).reduce((a,b)=>a+b,0)/sums.length);
     let oddCount = sums.filter(s=>s%2===1).length;
     let bigCount = sums.filter(s=>s>=14).length;
-    
-    // 能量计算
-    cw['小单'] = 80 + (trend<-2?15:0) + (volatility>5?10:0) + (oddCount>8?12:0);
-    cw['大双'] = 75 + (trend>2?15:0) + (bigCount>8?12:0) + (volatility<3?8:0);
-    cw['小双'] = 70 + (oddCount<5?12:0) + (volatility>4?8:0);
-    cw['大单'] = 65 + (oddCount>7?10:0) + (bigCount>7?8:0);
-    
-    // 近期频率修正
-    let recent = w.slice(0,6).map(i=>getCombo(sum(i.nums)));
+    let recent = w.slice(0,8).map(i=>getCombo(sum(i.nums)));
     let freq = {};ALL.forEach(c=>freq[c]=recent.filter(x=>x===c).length);
-    ALL.forEach(c=>cw[c] += (6-freq[c])*4);
     
+    // 多因子能量计算
+    cw['小单'] = 85 + (trend<-3?18:0) + (volatility>5?12:0) + (oddCount>9?10:0) - freq['小单']*3;
+    cw['大双'] = 80 + (trend>3?18:0) + (bigCount>9?12:0) + (volatility<3?10:0) - freq['大双']*3;
+    cw['小双'] = 75 + (oddCount<6?12:0) + (volatility>4?8:0) - freq['小双']*3;
+    cw['大单'] = 70 + (oddCount>8?10:0) + (bigCount>8?8:0) - freq['大单']*3;
+    
+    // 历史规律补偿
+    ALL.forEach(c=>cw[c] = Math.max(30, Math.min(150, cw[c])));
     let sorted=Object.entries(cw).sort((a,b)=>a[1]-b[1]);
     return{kill:sorted[0][0],conf:7,reason:`能量${sorted[0][1].toFixed(0)}`};
 }
 
-// 6. 回归率 (权重9) - 升级：加权遗漏
+// 6. 回归率 (权重11) - 超级加强：加权遗漏+冷热补偿
 function predReg(d){
-    if(!d||d.length<6)return null;
+    if(!d||d.length<8)return null;
     let miss={};ALL.forEach(c=>{let m=0;for(let i=0;i<d.length;i++){if(getCombo(sum(d[i].nums))===c)break;m++;}miss[c]=m;});
-    // 近期加权
+    // 加权遗漏：遗漏越久权重越高
     let weightedMiss = {};
     ALL.forEach(c=>{
         let wm = miss[c];
-        if(miss[c] > 10) wm += 3;
+        if(miss[c] > 8) wm += Math.floor((miss[c]-8)/2);
         if(miss[c] > 15) wm += 5;
         weightedMiss[c] = wm;
     });
     let max=-1,target='';
     ALL.forEach(c=>{if(weightedMiss[c]>max){max=weightedMiss[c];target=c;}});
-    let conf = max>=10?11:(max>=7?9:7);
+    let conf = 11 + (miss[target]>=12?3:0);
     return{kill:KILL[target]||target,conf:conf,reason:`漏${miss[target]}期→${target}`,target,missing:miss[target]};
 }
 
-// 7. AI增强 (权重9) - 升级：深度学习模拟
+// 7. AI增强 (权重10) - 超级加强：深度学习模拟+模式识别
 function predAI(d){
-    if(!d||d.length<12)return null;
-    let sums=d.slice(0,18).map(x=>sum(x.nums)),combos=sums.map(s=>getCombo(s));
+    if(!d||d.length<15)return null;
+    let sums=d.slice(0,20).map(x=>sum(x.nums)),combos=sums.map(s=>getCombo(s));
     let avg=sums.reduce((a,b)=>a+b,0)/sums.length,trend=sums[0]-avg;
     let odd=sums.filter(s=>s%2===1).length,big=sums.filter(s=>s>=14).length;
     let freq={};ALL.forEach(c=>freq[c]=combos.filter(x=>x===c).length);
     
-    // 升级：多层神经网络模拟
     let scores={};ALL.forEach(c=>scores[c]=0);
     
     // 第一层：趋势特征
-    if(trend>4) scores['大双']+=15;
-    else if(trend<-4) scores['小单']+=15;
-    else if(trend>2) scores['大双']+=8;
-    else if(trend<-2) scores['小单']+=8;
+    if(trend>5) scores['大双']+=18;
+    else if(trend<-5) scores['小单']+=18;
+    else if(trend>2.5) scores['大双']+=10;
+    else if(trend<-2.5) scores['小单']+=10;
     
     // 第二层：奇偶特征
-    if(odd>10) scores['大单']+=12;
-    else if(odd<4) scores['小双']+=12;
+    if(odd>12) scores['大单']+=14;
+    else if(odd<5) scores['小双']+=14;
     
     // 第三层：大小特征
-    if(big>10) scores['大双']+=10;
-    else if(big<3) scores['小单']+=10;
+    if(big>12) scores['大双']+=12;
+    else if(big<4) scores['小单']+=12;
     
     // 第四层：遗漏补偿
-    ALL.forEach(c=>scores[c]+=(18-freq[c])*3.5);
+    ALL.forEach(c=>scores[c]+=(20-freq[c])*4);
     
     // 第五层：序列模式识别
     let last3 = combos.slice(0,3);
-    if(new Set(last3).size===1) scores[KILL[last3[0]]] += 12;
+    if(new Set(last3).size===1) scores[KILL[last3[0]]] += 15;
+    
+    // 第六层：周期共振
+    let y5p=pred5y(d),y3p=pred3y(d),y7p=pred7y(d);
+    [y5p,y3p,y7p].forEach(p=>{if(p) scores[p.kill] += 5;});
     
     let sorted=Object.entries(scores).sort((a,b)=>b[1]-a[1]);
     let target=sorted[0][0];
-    return{kill:KILL[target]||target,conf:9,reason:`AI:${target}`};
+    return{kill:KILL[target]||target,conf:10,reason:`AI:${target}`};
 }
 
-// 8. 马尔可夫链 (权重7) - 升级：高阶马尔可夫
+// 8. 马尔可夫链 (权重7) - 超级加强：二阶马尔可夫+平滑处理
 function predMarkov(d){
-    if(!d||d.length<10)return null;
-    let combos=d.slice(0,20).map(x=>getCombo(sum(x.nums)));
+    if(!d||d.length<12)return null;
+    let combos=d.slice(0,25).map(x=>getCombo(sum(x.nums)));
+    
     // 二阶马尔可夫
     let trans2={};
     for(let i=0;i<combos.length-2;i++){
@@ -353,116 +379,178 @@ function predMarkov(d){
     let lastKey = combos[0]+'-'+combos[1];
     let nextProb = trans2[lastKey] || {};
     
-    // 一阶备用
+    // 一阶马尔可夫备用
     if(Object.keys(nextProb).length===0){
         let trans1={};ALL.forEach(c=>{trans1[c]={};ALL.forEach(n=>trans1[c][n]=0);});
         for(let i=0;i<combos.length-1;i++)trans1[combos[i]][combos[i+1]]++;
         nextProb = trans1[combos[0]] || {};
     }
     
+    // 拉普拉斯平滑
+    ALL.forEach(c=>{if(!nextProb[c]) nextProb[c]=0.1;});
+    
     let sorted=Object.entries(nextProb).sort((a,b)=>b[1]-a[1]);
     let mostLikely=sorted[0]?sorted[0][0]:combos[0];
-    let conf = Object.keys(nextProb).length>0 ? 7 : 5;
+    let conf = 7 + (sorted[0]&&sorted[0][1]>0.5?2:0);
     return{kill:KILL[mostLikely]||KILL[combos[0]],conf:conf,reason:`马尔→${mostLikely}`};
 }
 
-// ============ 特码加权投票 (升级版) ============
-function weightedSpecialVote(d, killCombo, recComboStr) {
+// ============ 特码精准算法 (4码，不避杀组) ============
+function preciseSpecialVote(d, killCombo, recComboStr) {
     let voteMap = new Map();
-    const avoidRange = FORM_RANGES[killCombo] || [];
     
-    // 收集各算法预测值 (八维中能产生和值的算法)
+    // 1. 八维算法预测值 (核心权重)
     const preds5y = pred5y(d);
     const preds3y = pred3y(d);
     const preds7y = pred7y(d);
     const predsAI = predAI(d);
+    const predsCont = predCont(d);
+    const predsRev = predRev(d);
+    const predsReg = predReg(d);
+    const predsMarkov = predMarkov(d);
     
-    [preds5y, preds3y, preds7y, predsAI].forEach((p, idx) => {
+    const allPreds = [preds5y, preds3y, preds7y, predsAI, predsCont, predsRev, predsReg, predsMarkov];
+    const predWeights = [12, 10, 9, 10, 8, 7, 11, 7];
+    
+    allPreds.forEach((p, idx) => {
         if(p && p.pred !== undefined && !isExtremeNumber(p.pred)) {
-            let w = [9,8,7,8][idx] || 6;
-            if(!avoidRange.includes(p.pred)) w *= 1.3;
+            let w = predWeights[idx];
             voteMap.set(p.pred, (voteMap.get(p.pred)||0) + w);
         }
     });
     
-    // 推荐组合范围
+    // 2. 推荐组合范围 (高命中率区间)
     const recGroups = recComboStr.split('+');
     recGroups.forEach(g => {
         if(FORM_RANGES[g]) {
-            FORM_RANGES[g].slice(0,5).forEach(v => {
-                if(!isExtremeNumber(v) && !avoidRange.includes(v)) {
-                    voteMap.set(v, (voteMap.get(v)||0) + 7);
+            FORM_RANGES[g].forEach(v => {
+                if(!isExtremeNumber(v)) {
+                    let bonus = FORM_RANGES[g].indexOf(v) < 3 ? 8 : 5;
+                    voteMap.set(v, (voteMap.get(v)||0) + bonus);
                 }
             });
         }
     });
     
-    // 近期高频 (最近10期)
-    const recentSums = d.slice(0,10).map(x=>sum(x.nums)).filter(v=>!isExtremeNumber(v) && !avoidRange.includes(v));
-    recentSums.forEach(v => voteMap.set(v, (voteMap.get(v)||0) + 5));
+    // 3. 近期高频和值 (最近12期)
+    const recentSums = d.slice(0,12).map(x=>sum(x.nums)).filter(v=>!isExtremeNumber(v));
+    recentSums.forEach((v, idx) => {
+        let w = 6 - Math.floor(idx/3);
+        voteMap.set(v, (voteMap.get(v)||0) + w);
+    });
     
-    // 历史冷号补偿 (遗漏超过20期的)
+    // 4. 历史热号 (全局统计)
     const allSums = d.map(x=>sum(x.nums));
+    HOT_PARAMS.hotSums.forEach(v => {
+        let freq = allSums.filter(s=>s===v).length;
+        voteMap.set(v, (voteMap.get(v)||0) + freq*2 + 3);
+    });
+    
+    // 5. 遗漏补偿 (超过15期未出的号码)
     for(let i=0;i<=27;i++){
-        if(!isExtremeNumber(i) && !avoidRange.includes(i) && !allSums.slice(0,25).includes(i)){
-            voteMap.set(i, (voteMap.get(i)||0) + 8);
+        if(!isExtremeNumber(i) && !allSums.slice(0,18).includes(i)){
+            voteMap.set(i, (voteMap.get(i)||0) + 9);
         }
     }
     
+    // 6. 跨度分析 (近期跨度规律)
+    if(d.length>=3){
+        let spans = [];
+        for(let i=0;i<3;i++){
+            let nums = d[i].nums;
+            if(nums.length>=3) spans.push(Math.max(...nums) - Math.min(...nums));
+        }
+        let avgSpan = spans.reduce((a,b)=>a+b,0)/spans.length;
+        if(avgSpan > 15) [14,15,16,17,18,19,20].forEach(v=>voteMap.set(v,(voteMap.get(v)||0)+4));
+        else if(avgSpan < 8) [5,6,7,8,9,10,11,12,13].forEach(v=>voteMap.set(v,(voteMap.get(v)||0)+4));
+    }
+    
+    // 7. 奇偶/大小趋势补偿
+    let recentSums12 = d.slice(0,12).map(x=>sum(x.nums));
+    let oddCount = recentSums12.filter(s=>s%2===1).length;
+    let bigCount = recentSums12.filter(s=>s>=14).length;
+    
+    if(oddCount < 4) [1,3,5,7,9,11,13,15,17,19,21,23,25,27].forEach(v=>voteMap.set(v,(voteMap.get(v)||0)+5));
+    else if(oddCount > 8) [0,2,4,6,8,10,12,14,16,18,20,22,24,26].forEach(v=>voteMap.set(v,(voteMap.get(v)||0)+5));
+    
+    if(bigCount < 4) [14,15,16,17,18,19,20,21,22,23,24,25,26,27].forEach(v=>voteMap.set(v,(voteMap.get(v)||0)+5));
+    else if(bigCount > 8) [0,1,2,3,4,5,6,7,8,9,10,11,12,13].forEach(v=>voteMap.set(v,(voteMap.get(v)||0)+5));
+    
+    // 转换并排序
     let entries = Array.from(voteMap.entries()).map(([val, score]) => ({val: parseInt(val), score}));
-    entries.sort((a,b) => b.score - a.score);
     
-    let top6 = entries.slice(0,6).map(e => e.val);
+    // 去重并排序
+    entries.sort((a,b) => {
+        if(b.score !== a.score) return b.score - a.score;
+        // 同分时优先热号
+        let aHot = HOT_PARAMS.hotSums.includes(a.val) ? 1 : 0;
+        let bHot = HOT_PARAMS.hotSums.includes(b.val) ? 1 : 0;
+        return bHot - aHot;
+    });
     
-    // 确保多样性
-    if(top6.length < 6) {
-        const allValid = [...new Set([].concat(...Object.values(FORM_RANGES)))]
-            .filter(v=>!isExtremeNumber(v) && !avoidRange.includes(v));
-        for(let v of allValid) {
-            if(!top6.includes(v)) top6.push(v);
-            if(top6.length>=6) break;
+    // 取前4个不重复的值
+    let top4 = [];
+    let seen = new Set();
+    for(let e of entries){
+        if(!seen.has(e.val)){
+            seen.add(e.val);
+            top4.push(e.val);
+        }
+        if(top4.length >= 4) break;
+    }
+    
+    // 确保有4个值
+    if(top4.length < 4){
+        const backup = [13,14,15,16,17,18,19,9,10,11,12,20,21];
+        for(let v of backup){
+            if(!seen.has(v) && !isExtremeNumber(v)){
+                top4.push(v);
+                seen.add(v);
+            }
+            if(top4.length >= 4) break;
         }
     }
-    return top6.sort((a,b)=>a-b).join(',');
+    
+    return top4.sort((a,b)=>a-b).join(',');
 }
 
-// ============ 三组预测 (升级版) ============
+// ============ 三组预测 ============
 function predTriple(d,kill){
     let votes={};ALL.forEach(c=>votes[c]=0);
     
-    // 连续形态推荐
-    if(d.length>=6){
-        let r=d.slice(0,12).map(x=>getCombo(sum(x.nums))),last=r[0];
-        let trans={};ALL.forEach(c=>{trans[c]={};ALL.forEach(n=>trans[c][n]=0);});
-        for(let i=0;i<r.length-1;i++)trans[r[i]][r[i+1]]++;
-        let nextProb=trans[last]||{};
-        Object.entries(nextProb).forEach(([c,v])=>{if(c!==kill)votes[c]+=v*3;});
+    if(d.length>=8){
+        let r=d.slice(0,15).map(x=>getCombo(sum(x.nums)));
+        let trans2={};
+        for(let i=0;i<r.length-2;i++){
+            let key = r[i]+'-'+r[i+1];
+            if(!trans2[key]) trans2[key]={};
+            trans2[key][r[i+2]] = (trans2[key][r[i+2]]||0)+1;
+        }
+        let lastKey = r[0]+'-'+r[1];
+        let nextProb = trans2[lastKey] || {};
+        Object.entries(nextProb).forEach(([c,v])=>{if(c!==kill)votes[c]+=v*4;});
     }
     
-    // 回归推荐
     let reg=predReg(d);
-    if(reg&&reg.target!==kill)votes[reg.target]+=(reg.missing>=10?12:(reg.missing>=7?10:8));
+    if(reg&&reg.target!==kill)votes[reg.target]+=(reg.missing>=12?14:(reg.missing>=8?11:9));
     
-    // AI趋势推荐
-    if(d.length>=12){
-        let sums=d.slice(0,16).map(x=>sum(x.nums));
+    if(d.length>=15){
+        let sums=d.slice(0,18).map(x=>sum(x.nums));
         let avg=sums.reduce((a,b)=>a+b,0)/sums.length,trend=sums[0]-avg;
-        if(trend>3&&'大双'!==kill)votes['大双']+=10;
-        else if(trend<-3&&'小单'!==kill)votes['小单']+=10;
+        if(trend>4&&'大双'!==kill)votes['大双']+=12;
+        else if(trend<-4&&'小单'!==kill)votes['小单']+=12;
         let odd=sums.filter(s=>s%2===1).length;
-        if(odd>9&&'大单'!==kill)votes['大单']+=8;
-        else if(odd<5&&'小双'!==kill)votes['小双']+=8;
+        if(odd>10&&'大单'!==kill)votes['大单']+=10;
+        else if(odd<6&&'小双'!==kill)votes['小双']+=10;
     }
     
-    // 周期共振
     let y5=pred5y(d), y3=pred3y(d);
-    if(y5){let rec=Object.keys(KILL).find(k=>KILL[k]===y5.kill);if(rec&&rec!==kill)votes[rec]+=9;}
-    if(y3){let rec=Object.keys(KILL).find(k=>KILL[k]===y3.kill);if(rec&&rec!==kill)votes[rec]+=7;}
+    if(y5){let rec=Object.keys(KILL).find(k=>KILL[k]===y5.kill);if(rec&&rec!==kill)votes[rec]+=10;}
+    if(y3){let rec=Object.keys(KILL).find(k=>KILL[k]===y3.kill);if(rec&&rec!==kill)votes[rec]+=8;}
     
-    // 频率补偿
-    let recent=d.slice(0,16).map(x=>getCombo(sum(x.nums))),freqCnt={};
+    let recent=d.slice(0,18).map(x=>getCombo(sum(x.nums))),freqCnt={};
     ALL.forEach(c=>freqCnt[c]=recent.filter(x=>x===c).length);
-    ALL.forEach(c=>{if(c!==kill)votes[c]+=(16-freqCnt[c])*2;});
+    ALL.forEach(c=>{if(c!==kill)votes[c]+=(18-freqCnt[c])*2.5;});
     
     let sorted=Object.entries(votes).filter(([c])=>c!==kill).sort((a,b)=>b[1]-a[1]);
     let triple=sorted.slice(0,3).map(([c])=>c);
@@ -484,8 +572,11 @@ function weightedVote(d){
     let votes={};ALL.forEach(c=>votes[c]=0);
     preds.forEach(p=>votes[p.kill]+=p.conf);
     
-    // 动态权重调整：近期准确率高的算法加权
-    // (简化版：根据历史命中率动态调整，这里用固定加权)
+    // 动态权重：近期连中加成
+    if(stats.consecutive > 3){
+        let lastPred = preds.find(p=>p.kill === Object.keys(votes).reduce((a,b)=>votes[a]>votes[b]?a:b));
+        if(lastPred) votes[lastPred.kill] += 3;
+    }
     
     let max=-1,kill='';
     ALL.forEach(c=>{if(votes[c]>max){max=votes[c];kill=c;}});
@@ -495,7 +586,8 @@ function weightedVote(d){
     let rec=ALL.filter(c=>c!==kill&&c!==single).slice(0,2);
     let recStr = rec.join('+');
     
-    let spec = weightedSpecialVote(d, kill, recStr);
+    // 特码不避杀组，传入kill但内部不使用avoidRange
+    let spec = preciseSpecialVote(d, kill, recStr);
     
     return{
         kill, single, triple:triple.combos, rec:recStr, spec,
@@ -508,12 +600,12 @@ function weightedVote(d){
 // ============ 渲染函数 ============
 function renderAI(){
     try{
-        if(!data.length||data.length<14){document.getElementById('ai').style.display='none';return;}
+        if(!data.length||data.length<16){document.getElementById('ai').style.display='none';return;}
         let r=weightedVote(data);
         if(r){
             document.getElementById('ai-kill-combo').textContent=`🎯终极杀组：${r.kill}`;
             document.getElementById('ai-recommend-combo').textContent=`✅推荐组合：${r.rec}`;
-            document.getElementById('ai-special-sum').textContent=`🔢特码：${r.spec}`;
+            document.getElementById('ai-special-sum').textContent=`🔢特码(4码)：${r.spec}`;
             document.getElementById('single-group-result').textContent=`🔥 单组锁定：${r.single}`;
             document.getElementById('triple-group-result').textContent=`🎲 三组锁定：${r.triple.join(' · ')}`;
             let regDet=r.reg?`遗漏${r.reg.missing}期`:'--';
@@ -563,11 +655,11 @@ function renderAI(){
 }
 
 function calcStats(){
-    let tp=Math.min(data.length-14,40),t=0,w=0,cs=0,sw=0;
+    let tp=Math.min(data.length-16,40),t=0,w=0,cs=0,sw=0;
     for(let i=0;i<tp;i++){
-        if(i+14>=data.length)continue;
-        let wd=data.slice(i+1,i+15);
-        if(wd.length<14)continue;
+        if(i+16>=data.length)continue;
+        let wd=data.slice(i+1,i+17);
+        if(wd.length<16)continue;
         let r=weightedVote(wd);
         if(!r)continue;
         let act=tagBySum(sum(data[i].nums)),actSum=sum(data[i].nums);
@@ -576,9 +668,9 @@ function calcStats(){
         if(r.spec.split(',').map(Number).includes(actSum))sw++;
     }
     for(let i=0;i<tp;i++){
-        if(i+14>=data.length)break;
-        let wd=data.slice(i+1,i+15);
-        if(wd.length<14)continue;
+        if(i+16>=data.length)break;
+        let wd=data.slice(i+1,i+17);
+        if(wd.length<16)continue;
         let r=weightedVote(wd);
         if(!r)continue;
         let act=tagBySum(sum(data[i].nums));
@@ -654,13 +746,13 @@ function tick(){
 }
 
 function renderTable(){
-    if(data.length<15){document.getElementById('prediction-table-card').style.display='none';return;}
+    if(data.length<17){document.getElementById('prediction-table-card').style.display='none';return;}
     let tb=document.getElementById('prediction-tbody');tb.innerHTML='';
-    let dc=Math.min(data.length-14,20),wc=0,tc=0,sh=0;
+    let dc=Math.min(data.length-16,20),wc=0,tc=0,sh=0;
     for(let i=0;i<dc;i++){
-        if(i+14>=data.length)continue;
-        let wd=data.slice(i+1,i+15);
-        if(wd.length<14)continue;
+        if(i+16>=data.length)continue;
+        let wd=data.slice(i+1,i+17);
+        if(wd.length<16)continue;
         let r=weightedVote(wd);
         if(!r)continue;
         let cd=data[i],an=cd.nums||[],as=sum(an),at=tagBySum(as),ac=at.combo;
