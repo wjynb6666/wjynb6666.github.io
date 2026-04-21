@@ -29,7 +29,14 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,B
 .ai-pill.info{background:#e6efff;border-color:#bfdbfe;color:#1e40af}
 .ai-pill.danger{background:#fee2e2;border-color:#fecaca;color:#b91c1c}
 .ai-pill.purple{background:#f3e8ff;border-color:#d8b4fe;color:#6b21a8}
+.ai-pill.deepseek{background:linear-gradient(135deg,#1a1a2e,#16213e);border-color:#0f3460;color:#e2e2e2;}
 .error{color:#111;padding:10px 0;font-size:16px;}
+
+.deepseek-box{margin-top:12px;padding:12px;background:linear-gradient(135deg,#1a1a2e,#16213e);border-radius:12px;border-left:6px solid #00d4aa;}
+.deepseek-title{font-weight:800;margin-bottom:8px;font-size:15px;color:#00d4aa;display:flex;align-items:center;gap:8px;}
+.deepseek-content{font-size:14px;line-height:1.6;color:#e2e2e2;}
+.deepseek-loading{color:#888;font-style:italic;}
+.deepseek-badge{background:#00d4aa;color:#1a1a2e;padding:2px 8px;border-radius:999px;font-size:11px;font-weight:700;margin-left:8px;}
 
 .prediction-table{margin-top:16px;width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed;}
 .prediction-table th{background:var(--primary-weak);color:var(--primary);padding:8px 4px;text-align:center;font-weight:600;border:1px solid var(--border);}
@@ -73,7 +80,7 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,B
 <div class="container">
 <div id="error" class="error" style="display:none;"></div>
 <div class="card">
-<div class="header"><div class="logo">🌀 至尊预测·AI深度融合</div><div class="small">超光速倒流</div></div>
+<div class="header"><div class="logo">🌀 至尊预测·AI深度融合</div><div class="small">DeepSeek AI</div></div>
 <div class="current">
 <div class="period">最新：<span id="cur-period">--</span> 期</div>
 <div class="nums"><span id="cur-nums">--+--+--=--</span><span id="cur-tag" class="badge">-- --</span></div>
@@ -89,6 +96,19 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,B
 <span id="ai-recommend-combo" class="ai-pill success">✅推荐组合：--</span>
 <span id="ai-special-sum" class="ai-pill info" style="background:#fef3c7;border-color:#fde68a;color:#92400e;">🔢特码(4码)：--</span>
 </div>
+
+<!-- DeepSeek AI 实时分析模块 -->
+<div class="deepseek-box" id="deepseek-box">
+<div class="deepseek-title">
+🤖 DeepSeek AI 实时分析
+<span class="deepseek-badge" id="ds-status">连接中</span>
+<button id="ds-refresh" style="margin-left:auto;background:#00d4aa;border:none;color:#1a1a2e;padding:4px 12px;border-radius:999px;font-size:12px;font-weight:700;cursor:pointer;">🔄 刷新分析</button>
+</div>
+<div class="deepseek-content" id="deepseek-content">
+<span class="deepseek-loading">⏳ 正在调用DeepSeek AI进行智能分析...</span>
+</div>
+</div>
+
 <div class="triple-group-box">
 <div class="group-title triple-group-title">🎲 三组预测 · AI加权锁定 (自动避杀)</div>
 <div id="triple-group-result" class="group-content triple-group-content">--</div>
@@ -132,21 +152,33 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,B
 </div>
 </div>
 <script>
+// DeepSeek API 配置 (请加密此部分)
+const DEEPSEEK_CONFIG = {
+    apiKey: 'sk-68313ceb483245a8a444511c0362ad25',
+    apiUrl: 'https://api.deepseek.com/v1/chat/completions',
+    model: 'deepseek-chat'
+};
+
 document.addEventListener('touchstart',function(e){if(e.touches.length>1)e.preventDefault();});
 let lastTouch=0;document.addEventListener('touchend',function(e){let n=Date.now();if(n-lastTouch<=300)e.preventDefault();lastTouch=n;},false);
 ['gesturestart','gesturechange','gestureend'].forEach(e=>document.addEventListener(e,ev=>ev.preventDefault()));
 
 const CFG={period:'expect',nums:'opencode',time:'opentime',sep:',',api:'https://super.pc28998.com/history/JND28?limit=100'};
 let data=[],nextTime=null,timer=null,fetching=false,stats={};
+let currentPrediction = null; // 存储当前预测结果供DeepSeek使用
 
-// 历史回测最优参数缓存
 const HOT_PARAMS = {
     weights: {y5:12, y3:10, y7:9, cont:8, rev:7, reg:11, ai:10, markov:7},
     hotSums: [13,14,15,16,17,18,19,20,21,9,10,11,12],
     coldSums: [0,1,2,3,4,5,6,7,8,22,23,24,25,26,27]
 };
 
-document.addEventListener('DOMContentLoaded',()=>{initStats();fetchData();});
+document.addEventListener('DOMContentLoaded',()=>{
+    initStats();
+    fetchData();
+    document.getElementById('ds-refresh').addEventListener('click', callDeepSeekAPI);
+});
+
 function initStats(){stats={total:0,win:0,consecutive:0,winRate:0,specialWin:0,specialRate:0};}
 function setError(m){let e=document.getElementById('error');e.textContent=m;e.style.display='block';}
 function clearError(){document.getElementById('error').style.display='none';}
@@ -158,6 +190,8 @@ function fetchData(){
         data=extractArray(j).slice(0,100).map(it=>({...it,nums:parseNums(it[CFG.nums])}));
         if(!data.length)throw new Error('无数据');
         renderCurrent();setupCountdown();renderAI();calcStats();updateMonitor();renderTable();
+        // 数据加载完成后调用DeepSeek
+        setTimeout(callDeepSeekAPI, 500);
         fetching=false;
     }).catch(e=>{console.error(e);setError('出错：'+e.message);fetching=false;});
 }
@@ -186,9 +220,122 @@ function getY5(s){for(let[k,v]of Object.entries(Y5))if(v.includes(s))return k;re
 function getY3(s){for(let[k,v]of Object.entries(Y3))if(v.includes(s))return k;return null;}
 function getY7(s){for(let[k,v]of Object.entries(Y7))if(v.includes(s))return k;return null;}
 
-// ============ 超级加强版八维算法 ============
+// ============ DeepSeek AI 调用 ============
+async function callDeepSeekAPI() {
+    const contentEl = document.getElementById('deepseek-content');
+    const statusEl = document.getElementById('ds-status');
+    
+    if(!data || data.length < 16) {
+        contentEl.innerHTML = '⏳ 数据加载中，请稍后再试...';
+        return;
+    }
+    
+    statusEl.textContent = '分析中';
+    statusEl.style.background = '#fbbf24';
+    contentEl.innerHTML = '<span class="deepseek-loading">🤔 DeepSeek正在分析历史数据与当前预测...</span>';
+    
+    // 准备分析数据
+    const recentData = data.slice(0, 20).map((d, idx) => {
+        const s = sum(d.nums);
+        return {
+            period: d[CFG.period],
+            nums: d.nums.join('+'),
+            sum: s,
+            combo: getCombo(s)
+        };
+    });
+    
+    const prediction = currentPrediction || {};
+    
+    const prompt = `你是一个专业的彩票数据分析AI。请基于以下最近20期开奖数据进行智能分析：
 
-// 1. 5y预测 (权重12) - 超级加强：多周期共振+趋势验证
+【最近20期数据】
+${recentData.map(d => `期号${d.period}: ${d.nums}=${d.sum} (${d.combo})`).join('\n')}
+
+【当前模型预测结果】
+- 预测期数: ${prediction.nextPeriod || '--'}
+- 终极杀组: ${prediction.kill || '--'}
+- 推荐组合: ${prediction.rec || '--'}
+- 特码4码: ${prediction.spec || '--'}
+- 三组预测: ${prediction.triple ? prediction.triple.join(' · ') : '--'}
+- 单组预测: ${prediction.single || '--'}
+- 杀组投票得分: ${prediction.killVote || '--'}
+
+【近期统计】
+- 最近10期奇偶比: ${recentData.slice(0,10).filter(d=>d.sum%2===1).length}:${recentData.slice(0,10).filter(d=>d.sum%2===0).length}
+- 最近10期大小比: ${recentData.slice(0,10).filter(d=>d.sum>=14).length}:${recentData.slice(0,10).filter(d=>d.sum<14).length}
+- 最近10期和值范围: ${Math.min(...recentData.slice(0,10).map(d=>d.sum))} - ${Math.max(...recentData.slice(0,10).map(d=>d.sum))}
+
+请用100-150字给出：
+1. 对当前预测结果的置信度评估
+2. 值得关注的和值区间
+3. 简要的投注建议
+
+请用中文回答，语言简洁专业。`;
+
+    try {
+        const response = await fetch(DEEPSEEK_CONFIG.apiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${DEEPSEEK_CONFIG.apiKey}`
+            },
+            body: JSON.stringify({
+                model: DEEPSEEK_CONFIG.model,
+                messages: [
+                    {
+                        role: 'system',
+                        content: '你是一个专业的彩票数据分析师，擅长从历史数据中发现规律，给出专业的分析建议。回答简洁专业，不超过150字。'
+                    },
+                    {
+                        role: 'user',
+                        content: prompt
+                    }
+                ],
+                max_tokens: 300,
+                temperature: 0.7
+            })
+        });
+        
+        if(!response.ok) {
+            throw new Error(`API错误: ${response.status}`);
+        }
+        
+        const result = await response.json();
+        const aiResponse = result.choices[0].message.content;
+        
+        statusEl.textContent = '在线';
+        statusEl.style.background = '#00d4aa';
+        contentEl.innerHTML = `📊 ${aiResponse}`;
+        
+    } catch(error) {
+        console.error('DeepSeek API 调用失败:', error);
+        statusEl.textContent = '离线';
+        statusEl.style.background = '#ef4444';
+        
+        // 降级方案：使用本地分析
+        const localAnalysis = generateLocalAnalysis();
+        contentEl.innerHTML = `📊 ${localAnalysis}<br><span style="color:#888;font-size:11px;">(离线模式-本地分析)</span>`;
+    }
+}
+
+// 本地分析降级方案
+function generateLocalAnalysis() {
+    if(!data || data.length < 10) return '数据不足，无法分析';
+    
+    const recent = data.slice(0, 10).map(d => sum(d.nums));
+    const avg = recent.reduce((a,b)=>a+b,0)/recent.length;
+    const oddCount = recent.filter(s=>s%2===1).length;
+    const bigCount = recent.filter(s=>s>=14).length;
+    const pred = currentPrediction || {};
+    
+    let trend = avg > 14 ? '偏大' : '偏小';
+    let oddTrend = oddCount > 5 ? '奇数偏多' : '偶数偏多';
+    
+    return `近期${trend}趋势，${oddTrend}。建议关注${pred.rec || '均衡'}组合，特码关注${pred.spec || '中位值'}。综合置信度较高。`;
+}
+
+// ============ 超级加强版八维算法 (保持不变) ============
 function pred5y(d){
     if(!d||d.length<4)return null;
     let s=sum(d[0].nums),g=getY5(s);
@@ -199,17 +346,14 @@ function pred5y(d){
         if(getY5(ps)===g)matches.push({val:ps,pos:i});
     }
     if(matches.length===0)return null;
-    // 取最近两次匹配的加权平均
     let p = matches.length>=2 ? Math.round(matches[0].val*0.7 + matches[1].val*0.3) : matches[0].val;
     let pred=s+p;if(pred>27)pred-=27;
-    // 趋势验证加成
     let trend = s - sum(d[3]?.nums||[0]);
     let conf = 12 + (Math.abs(trend)>8?3:0) + (matches.length>=3?2:0);
     let c=getCombo(pred);
     return{kill:KILL[c]||c,conf:conf,reason:`5y${g}→${pred}`,pred};
 }
 
-// 2. 3y预测 (权重10) - 超级加强：三重验证+周期共振
 function pred3y(d){
     if(!d||d.length<4)return null;
     let s=sum(d[0].nums),g=getY3(s);
@@ -220,20 +364,17 @@ function pred3y(d){
         if(getY3(ps)===g)matches.push({val:ps,pos:i});
     }
     if(matches.length===0)return null;
-    // 三重验证：取前三个匹配值加权
     let p = matches[0].val;
     if(matches.length>=3) p = Math.round(matches[0].val*0.5 + matches[1].val*0.3 + matches[2].val*0.2);
     else if(matches.length>=2) p = Math.round(matches[0].val*0.6 + matches[1].val*0.4);
     let pred=s+p;if(pred>27)pred-=27;
     let conf = 10 + (matches.length>=3?3:0);
-    // 与5y共振加成
     let y5p = pred5y(d);
     if(y5p && y5p.kill === KILL[getCombo(pred)]) conf += 2;
     let c=getCombo(pred);
     return{kill:KILL[c]||c,conf:conf,reason:`3y${g}→${pred}`,pred};
 }
 
-// 3. 7y预测 (权重9) - 超级加强：周期共振+跨度验证
 function pred7y(d){
     if(!d||d.length<5)return null;
     let s=sum(d[0].nums),g=getY7(s);
@@ -248,7 +389,6 @@ function pred7y(d){
     if(matches.length>=2) p = Math.round((matches[0].val+matches[1].val)/2);
     let pred=s+p;if(pred>27)pred-=27;
     let conf = 9 + (matches.length>=2?2:0);
-    // 多周期共振
     let y5p = pred5y(d), y3p = pred3y(d);
     let killCombo = KILL[getCombo(pred)];
     if((y5p && y5p.kill === killCombo) || (y3p && y3p.kill === killCombo)) conf += 2;
@@ -256,11 +396,9 @@ function pred7y(d){
     return{kill:KILL[c]||c,conf:conf,reason:`7y${g}→${pred}`,pred};
 }
 
-// 4. 连续形态 (权重8) - 超级加强：高阶马尔可夫转换
 function predCont(d){
     if(!d||d.length<8)return null;
     let r=d.slice(0,15).map(x=>getCombo(sum(x.nums))),last=r[0];
-    // 二阶马尔可夫转换矩阵
     let trans2={};
     for(let i=0;i<r.length-2;i++){
         let key = r[i]+'-'+r[i+1];
@@ -280,7 +418,6 @@ function predCont(d){
     return{kill:target,conf:conf,reason:`${last}→${target}`};
 }
 
-// 5. 反向因果 (权重7) - 超级加强：多因子能量模型+历史规律
 function predRev(d){
     if(!d||d.length<16)return null;
     let w=d.slice(0,16),cw={};ALL.forEach(c=>cw[c]=0);
@@ -293,23 +430,19 @@ function predRev(d){
     let recent = w.slice(0,8).map(i=>getCombo(sum(i.nums)));
     let freq = {};ALL.forEach(c=>freq[c]=recent.filter(x=>x===c).length);
     
-    // 多因子能量计算
     cw['小单'] = 85 + (trend<-3?18:0) + (volatility>5?12:0) + (oddCount>9?10:0) - freq['小单']*3;
     cw['大双'] = 80 + (trend>3?18:0) + (bigCount>9?12:0) + (volatility<3?10:0) - freq['大双']*3;
     cw['小双'] = 75 + (oddCount<6?12:0) + (volatility>4?8:0) - freq['小双']*3;
     cw['大单'] = 70 + (oddCount>8?10:0) + (bigCount>8?8:0) - freq['大单']*3;
     
-    // 历史规律补偿
     ALL.forEach(c=>cw[c] = Math.max(30, Math.min(150, cw[c])));
     let sorted=Object.entries(cw).sort((a,b)=>a[1]-b[1]);
     return{kill:sorted[0][0],conf:7,reason:`能量${sorted[0][1].toFixed(0)}`};
 }
 
-// 6. 回归率 (权重11) - 超级加强：加权遗漏+冷热补偿
 function predReg(d){
     if(!d||d.length<8)return null;
     let miss={};ALL.forEach(c=>{let m=0;for(let i=0;i<d.length;i++){if(getCombo(sum(d[i].nums))===c)break;m++;}miss[c]=m;});
-    // 加权遗漏：遗漏越久权重越高
     let weightedMiss = {};
     ALL.forEach(c=>{
         let wm = miss[c];
@@ -323,7 +456,6 @@ function predReg(d){
     return{kill:KILL[target]||target,conf:conf,reason:`漏${miss[target]}期→${target}`,target,missing:miss[target]};
 }
 
-// 7. AI增强 (权重10) - 超级加强：深度学习模拟+模式识别
 function predAI(d){
     if(!d||d.length<15)return null;
     let sums=d.slice(0,20).map(x=>sum(x.nums)),combos=sums.map(s=>getCombo(s));
@@ -333,28 +465,22 @@ function predAI(d){
     
     let scores={};ALL.forEach(c=>scores[c]=0);
     
-    // 第一层：趋势特征
     if(trend>5) scores['大双']+=18;
     else if(trend<-5) scores['小单']+=18;
     else if(trend>2.5) scores['大双']+=10;
     else if(trend<-2.5) scores['小单']+=10;
     
-    // 第二层：奇偶特征
     if(odd>12) scores['大单']+=14;
     else if(odd<5) scores['小双']+=14;
     
-    // 第三层：大小特征
     if(big>12) scores['大双']+=12;
     else if(big<4) scores['小单']+=12;
     
-    // 第四层：遗漏补偿
     ALL.forEach(c=>scores[c]+=(20-freq[c])*4);
     
-    // 第五层：序列模式识别
     let last3 = combos.slice(0,3);
     if(new Set(last3).size===1) scores[KILL[last3[0]]] += 15;
     
-    // 第六层：周期共振
     let y5p=pred5y(d),y3p=pred3y(d),y7p=pred7y(d);
     [y5p,y3p,y7p].forEach(p=>{if(p) scores[p.kill] += 5;});
     
@@ -363,12 +489,10 @@ function predAI(d){
     return{kill:KILL[target]||target,conf:10,reason:`AI:${target}`};
 }
 
-// 8. 马尔可夫链 (权重7) - 超级加强：二阶马尔可夫+平滑处理
 function predMarkov(d){
     if(!d||d.length<12)return null;
     let combos=d.slice(0,25).map(x=>getCombo(sum(x.nums)));
     
-    // 二阶马尔可夫
     let trans2={};
     for(let i=0;i<combos.length-2;i++){
         let key = combos[i]+'-'+combos[i+1];
@@ -379,14 +503,12 @@ function predMarkov(d){
     let lastKey = combos[0]+'-'+combos[1];
     let nextProb = trans2[lastKey] || {};
     
-    // 一阶马尔可夫备用
     if(Object.keys(nextProb).length===0){
         let trans1={};ALL.forEach(c=>{trans1[c]={};ALL.forEach(n=>trans1[c][n]=0);});
         for(let i=0;i<combos.length-1;i++)trans1[combos[i]][combos[i+1]]++;
         nextProb = trans1[combos[0]] || {};
     }
     
-    // 拉普拉斯平滑
     ALL.forEach(c=>{if(!nextProb[c]) nextProb[c]=0.1;});
     
     let sorted=Object.entries(nextProb).sort((a,b)=>b[1]-a[1]);
@@ -395,11 +517,9 @@ function predMarkov(d){
     return{kill:KILL[mostLikely]||KILL[combos[0]],conf:conf,reason:`马尔→${mostLikely}`};
 }
 
-// ============ 特码精准算法 (4码，不避杀组) ============
 function preciseSpecialVote(d, killCombo, recComboStr) {
     let voteMap = new Map();
     
-    // 1. 八维算法预测值 (核心权重)
     const preds5y = pred5y(d);
     const preds3y = pred3y(d);
     const preds7y = pred7y(d);
@@ -419,7 +539,6 @@ function preciseSpecialVote(d, killCombo, recComboStr) {
         }
     });
     
-    // 2. 推荐组合范围 (高命中率区间)
     const recGroups = recComboStr.split('+');
     recGroups.forEach(g => {
         if(FORM_RANGES[g]) {
@@ -432,28 +551,24 @@ function preciseSpecialVote(d, killCombo, recComboStr) {
         }
     });
     
-    // 3. 近期高频和值 (最近12期)
     const recentSums = d.slice(0,12).map(x=>sum(x.nums)).filter(v=>!isExtremeNumber(v));
     recentSums.forEach((v, idx) => {
         let w = 6 - Math.floor(idx/3);
         voteMap.set(v, (voteMap.get(v)||0) + w);
     });
     
-    // 4. 历史热号 (全局统计)
     const allSums = d.map(x=>sum(x.nums));
     HOT_PARAMS.hotSums.forEach(v => {
         let freq = allSums.filter(s=>s===v).length;
         voteMap.set(v, (voteMap.get(v)||0) + freq*2 + 3);
     });
     
-    // 5. 遗漏补偿 (超过15期未出的号码)
     for(let i=0;i<=27;i++){
         if(!isExtremeNumber(i) && !allSums.slice(0,18).includes(i)){
             voteMap.set(i, (voteMap.get(i)||0) + 9);
         }
     }
     
-    // 6. 跨度分析 (近期跨度规律)
     if(d.length>=3){
         let spans = [];
         for(let i=0;i<3;i++){
@@ -465,7 +580,6 @@ function preciseSpecialVote(d, killCombo, recComboStr) {
         else if(avgSpan < 8) [5,6,7,8,9,10,11,12,13].forEach(v=>voteMap.set(v,(voteMap.get(v)||0)+4));
     }
     
-    // 7. 奇偶/大小趋势补偿
     let recentSums12 = d.slice(0,12).map(x=>sum(x.nums));
     let oddCount = recentSums12.filter(s=>s%2===1).length;
     let bigCount = recentSums12.filter(s=>s>=14).length;
@@ -476,19 +590,15 @@ function preciseSpecialVote(d, killCombo, recComboStr) {
     if(bigCount < 4) [14,15,16,17,18,19,20,21,22,23,24,25,26,27].forEach(v=>voteMap.set(v,(voteMap.get(v)||0)+5));
     else if(bigCount > 8) [0,1,2,3,4,5,6,7,8,9,10,11,12,13].forEach(v=>voteMap.set(v,(voteMap.get(v)||0)+5));
     
-    // 转换并排序
     let entries = Array.from(voteMap.entries()).map(([val, score]) => ({val: parseInt(val), score}));
     
-    // 去重并排序
     entries.sort((a,b) => {
         if(b.score !== a.score) return b.score - a.score;
-        // 同分时优先热号
         let aHot = HOT_PARAMS.hotSums.includes(a.val) ? 1 : 0;
         let bHot = HOT_PARAMS.hotSums.includes(b.val) ? 1 : 0;
         return bHot - aHot;
     });
     
-    // 取前4个不重复的值
     let top4 = [];
     let seen = new Set();
     for(let e of entries){
@@ -499,7 +609,6 @@ function preciseSpecialVote(d, killCombo, recComboStr) {
         if(top4.length >= 4) break;
     }
     
-    // 确保有4个值
     if(top4.length < 4){
         const backup = [13,14,15,16,17,18,19,9,10,11,12,20,21];
         for(let v of backup){
@@ -514,7 +623,6 @@ function preciseSpecialVote(d, killCombo, recComboStr) {
     return top4.sort((a,b)=>a-b).join(',');
 }
 
-// ============ 三组预测 ============
 function predTriple(d,kill){
     let votes={};ALL.forEach(c=>votes[c]=0);
     
@@ -562,7 +670,6 @@ function predTriple(d,kill){
     return{combos:triple,votes,top:sorted[0]?sorted[0][1]:0};
 }
 
-// ============ 加权投票主函数 ============
 function weightedVote(d){
     let preds=[
         pred5y(d), pred3y(d), pred7y(d), predCont(d),
@@ -572,7 +679,6 @@ function weightedVote(d){
     let votes={};ALL.forEach(c=>votes[c]=0);
     preds.forEach(p=>votes[p.kill]+=p.conf);
     
-    // 动态权重：近期连中加成
     if(stats.consecutive > 3){
         let lastPred = preds.find(p=>p.kill === Object.keys(votes).reduce((a,b)=>votes[a]>votes[b]?a:b));
         if(lastPred) votes[lastPred.kill] += 3;
@@ -586,22 +692,30 @@ function weightedVote(d){
     let rec=ALL.filter(c=>c!==kill&&c!==single).slice(0,2);
     let recStr = rec.join('+');
     
-    // 特码不避杀组，传入kill但内部不使用avoidRange
     let spec = preciseSpecialVote(d, kill, recStr);
+    
+    let np=(()=>{
+        let c=d[0][CFG.period],n=Number(c);
+        if(Number.isFinite(n))return String(n+1);
+        let m=String(c||'').match(/(\d+)(?!.*\d)/);
+        return m?String(Number(m[1])+1):'--';
+    })();
     
     return{
         kill, single, triple:triple.combos, rec:recStr, spec,
         votes, tVotes:triple.votes,
         y5:pred5y(d), y3:pred3y(d), y7:pred7y(d), cont:predCont(d),
-        rev:predRev(d), reg, ai:predAI(d), markov:predMarkov(d)
+        rev:predRev(d), reg, ai:predAI(d), markov:predMarkov(d),
+        nextPeriod: np, killVote: max
     };
 }
 
-// ============ 渲染函数 ============
 function renderAI(){
     try{
         if(!data.length||data.length<16){document.getElementById('ai').style.display='none';return;}
-        let r=weightedVote(data);
+        let r = weightedVote(data);
+        currentPrediction = r; // 保存供DeepSeek使用
+        
         if(r){
             document.getElementById('ai-kill-combo').textContent=`🎯终极杀组：${r.kill}`;
             document.getElementById('ai-recommend-combo').textContent=`✅推荐组合：${r.rec}`;
@@ -643,13 +757,7 @@ function renderAI(){
                 tvd.appendChild(d);
             });
         }
-        let np=(()=>{
-            let c=data[0][CFG.period],n=Number(c);
-            if(Number.isFinite(n))return String(n+1);
-            let m=String(c||'').match(/(\d+)(?!.*\d)/);
-            return m?String(Number(m[1])+1):'--';
-        })();
-        document.getElementById('ai-nextperiod').textContent=`📅预测期数：${np}`;
+        document.getElementById('ai-nextperiod').textContent=`📅预测期数：${r.nextPeriod}`;
         document.getElementById('ai').style.display='block';
     }catch(e){console.error(e);}
 }
