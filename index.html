@@ -33,7 +33,33 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,B
 .ai-pill.gold{background:linear-gradient(135deg,#854d0e,#eab308);border-color:#eab308;color:#fff;}
 .error{color:var(--danger);padding:10px 0;font-size:16px;text-align:center;}
 
-/* 核心预测卡片 - 全新布局 */
+/* 弹窗公告样式 */
+.modal-overlay{position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.8);backdrop-filter:blur(8px);z-index:9999;display:flex;align-items:center;justify-content:center;padding:16px;animation:fadeIn 0.3s ease;}
+.modal-content{background:linear-gradient(145deg,#1a1a2e,#16213e);border:2px solid var(--primary);border-radius:24px;padding:24px 20px;max-width:400px;width:100%;box-shadow:0 20px 60px rgba(0,212,170,0.3);animation:slideUp 0.3s ease;}
+.modal-header{text-align:center;margin-bottom:20px;}
+.modal-title{font-size:22px;font-weight:800;background:linear-gradient(135deg,#ffd700,#00d4aa);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px;}
+.modal-subtitle{color:var(--muted);font-size:13px;}
+.modal-body{color:var(--text);font-size:15px;line-height:1.8;text-align:center;}
+.sponsor-list{display:flex;flex-direction:column;gap:8px;margin:16px 0;padding:12px;background:rgba(0,212,170,0.08);border-radius:16px;}
+.sponsor-item{font-size:16px;font-weight:600;}
+.sponsor-item.gold{color:#ffd700;}
+.sponsor-item.primary{color:var(--primary);}
+.sponsor-thanks{margin:12px 0;font-size:13px;color:var(--muted);font-style:italic;}
+.register-link{display:block;background:linear-gradient(135deg,#00d4aa,#4facfe);color:#0f0f1a;text-decoration:none;padding:14px 20px;border-radius:999px;font-weight:800;font-size:16px;text-align:center;margin:16px 0 8px;transition:all 0.2s;border:none;cursor:pointer;}
+.register-link:hover{transform:scale(1.02);box-shadow:0 8px 20px rgba(0,212,170,0.4);}
+.register-url{font-size:18px;letter-spacing:1px;}
+.modal-footer{display:flex;gap:12px;margin-top:16px;}
+.modal-btn{flex:1;padding:12px;border-radius:999px;font-weight:600;font-size:14px;cursor:pointer;transition:all 0.2s;border:none;}
+.modal-btn.primary{background:var(--primary);color:#0f0f1a;}
+.modal-btn.secondary{background:transparent;border:1px solid var(--border);color:var(--muted);}
+.modal-btn:hover{opacity:0.9;}
+.dont-show-label{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:12px;color:var(--muted);font-size:12px;cursor:pointer;}
+.dont-show-label input{width:16px;height:16px;accent-color:var(--primary);cursor:pointer;}
+
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes slideUp{from{transform:translateY(30px);opacity:0}to{transform:translateY(0);opacity:1}}
+
+/* 核心预测卡片 */
 .prediction-core{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:12px 0;}
 .kill-card{background:linear-gradient(135deg,#7f1d1d20,#ef444420);border:1px solid #ef4444;border-radius:16px;padding:16px;text-align:center;}
 .rec-card{background:linear-gradient(135deg,#065f4620,#10b98120);border:1px solid #10b981;border-radius:16px;padding:16px;text-align:center;}
@@ -48,7 +74,6 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,B
 .group-content{font-size:18px;font-weight:700;}
 .group-detail{font-size:12px;opacity:0.8;margin-top:4px;}
 
-/* DeepSeek AI 模块 */
 .deepseek-box{margin-top:14px;padding:14px;background:linear-gradient(135deg,#1a1a2e,#0f0f1a);border-radius:16px;border:1px solid #00d4aa;}
 .deepseek-title{font-weight:800;margin-bottom:10px;font-size:14px;color:#00d4aa;display:flex;align-items:center;gap:8px;}
 .deepseek-content{font-size:13px;line-height:1.6;color:#c0c0d0;}
@@ -86,10 +111,44 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,B
     .card-value{font-size:22px;}
     .prediction-table{font-size:9px;}
     .ai-pill{font-size:11px;padding:5px 10px;}
+    .modal-content{padding:20px 16px;}
 }
 </style>
 </head>
 <body>
+
+<!-- 弹窗公告 -->
+<div class="modal-overlay" id="announcementModal">
+<div class="modal-content">
+<div class="modal-header">
+<div class="modal-title">📢 致谢公告</div>
+<div class="modal-subtitle">感谢以下赞助商的大力支持</div>
+</div>
+<div class="modal-body">
+<p style="margin-bottom:12px;">此算法的使用者们，大家好！</p>
+<p style="margin-bottom:16px;">在此特别感谢以下赞助商对此算法的支持</p>
+<div class="sponsor-list">
+<span class="sponsor-item gold">🏆 汇赢国际</span>
+<span class="sponsor-item primary">💎 NG集团</span>
+<span class="sponsor-item gold">👑 富贵娱乐</span>
+</div>
+<p style="margin:12px 0;">以及个人对此算法的赞助支持</p>
+<p class="sponsor-thanks">在此向赞助此算法的个人或单位表示致谢</p>
+<p style="margin:16px 0 8px;font-size:14px;">请使用此算法的点击下方链接注册</p>
+<a href="https://93huw.top" target="_blank" class="register-link" id="registerBtn">
+<span class="register-url">🌐 93huw.top</span>
+</a>
+</div>
+<div class="modal-footer">
+<button class="modal-btn primary" id="closeModalBtn">我知道了</button>
+<button class="modal-btn secondary" id="copyLinkBtn">📋 复制链接</button>
+</div>
+<label class="dont-show-label">
+<input type="checkbox" id="dontShowAgain"> 今天不再显示
+</label>
+</div>
+</div>
+
 <div class="container">
 <div id="error" class="error" style="display:none;"></div>
 
@@ -222,6 +281,55 @@ body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,B
 <script>
 (function(){
 'use strict';
+
+// ============ 弹窗公告逻辑 ============
+function initModal(){
+    const modal = document.getElementById('announcementModal');
+    const closeBtn = document.getElementById('closeModalBtn');
+    const copyBtn = document.getElementById('copyLinkBtn');
+    const registerBtn = document.getElementById('registerBtn');
+    const dontShowCheck = document.getElementById('dontShowAgain');
+    
+    // 检查是否今天已关闭
+    const modalDismissed = localStorage.getItem('announcementDismissed');
+    const dismissDate = localStorage.getItem('announcementDismissDate');
+    const today = new Date().toDateString();
+    
+    if(modalDismissed === 'true' && dismissDate === today){
+        modal.style.display = 'none';
+    }
+    
+    function closeModal(){
+        modal.style.display = 'none';
+        if(dontShowCheck.checked){
+            localStorage.setItem('announcementDismissed', 'true');
+            localStorage.setItem('announcementDismissDate', new Date().toDateString());
+        }
+    }
+    
+    closeBtn.addEventListener('click', closeModal);
+    
+    // 点击背景关闭
+    modal.addEventListener('click', function(e){
+        if(e.target === modal) closeModal();
+    });
+    
+    // 复制链接
+    copyBtn.addEventListener('click', function(){
+        const link = 'https://93huw.top';
+        navigator.clipboard?.writeText(link).then(()=>{
+            alert('链接已复制: ' + link);
+        }).catch(()=>{
+            prompt('手动复制链接:', link);
+        });
+    });
+    
+    // 注册按钮
+    registerBtn.addEventListener('click', function(e){
+        e.preventDefault();
+        window.open('https://93huw.top', '_blank');
+    });
+}
 
 // DeepSeek API 配置
 const DEEPSEEK_CONFIG = {
@@ -777,6 +885,7 @@ function fetchData(){
 }
 
 document.addEventListener('DOMContentLoaded',()=>{
+    initModal();
     fetchData();
     document.getElementById('ds-refresh').addEventListener('click', callDeepSeekAPI);
 });
