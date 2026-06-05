@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>好u-预测全网最稳</title>
+    <title>小恒杀组｜精准杀号系统</title>
     <style>
         * {
             margin: 0;
@@ -29,7 +29,7 @@
             --radius-2xl: 36px;
             --radius-full: 999px;
             --shadow-md: 0 8px 24px rgba(0,0,0,0.08);
-            --shadow-lg: 16px 48px rgba(0,0,0,0.12);
+            --shadow-lg: 0 16px 48px rgba(0,0,0,0.12);
         }
         [data-theme="dark"] {
             --bg-primary: #1A1A1A;
@@ -245,114 +245,6 @@
             font-weight: 600;
             color: var(--accent);
         }
-        /* 模拟预测黄色区域 改成和下方一样的三组布局 */
-        .simulate-card {
-            background: linear-gradient(135deg, #FFB800 0%, #FF9500 100%);
-            border-radius: var(--radius-2xl);
-            padding: 24px;
-            margin-bottom: 24px;
-            box-shadow: var(--shadow-lg);
-            border: 3px solid #FFD60A;
-        }
-        .simulate-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        .simulate-header h3 {
-            font-size: 18px;
-            font-weight: 800;
-            color: white;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-        .simulate-hit-count {
-            background: white;
-            padding: 6px 16px;
-            border-radius: 40px;
-            font-size: 14px;
-            font-weight: 700;
-            color: #FF9500;
-        }
-        .simulate-info {
-            display: flex;
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-        .simulate-info-item {
-            flex: 1;
-            background: rgba(255,255,255,0.2);
-            border-radius: 20px;
-            padding: 12px;
-            text-align: center;
-            color: white;
-        }
-        .simulate-info-label {
-            font-size: 11px;
-            opacity: 0.9;
-            margin-bottom: 4px;
-        }
-        .simulate-info-value {
-            font-size: 16px;
-            font-weight: 700;
-        }
-        /* 模拟三组答案 完全复刻下方真实三门池样式 */
-        .sim-kill-section {
-            background: #fff;
-            border-radius: 28px;
-            padding: 20px;
-            text-align: center;
-            margin-bottom: 20px;
-            border: 1px solid #ffe082;
-        }
-        .sim-rec-section {
-            display: flex;
-            gap: 16px;
-            margin-bottom: 16px;
-        }
-        .sim-rec-item {
-            flex: 1;
-            background: #fff;
-            border-radius: 28px;
-            padding: 16px;
-            text-align: center;
-            border: 1px solid #ffe082;
-        }
-        .sim-label {
-            font-size: 13px;
-            color: #666;
-            margin-bottom: 6px;
-        }
-        .sim-val-main {
-            font-size: 44px;
-            font-weight: 800;
-            color: #FF9500;
-            letter-spacing: 2px;
-        }
-        .sim-val-sub {
-            font-size: 28px;
-            font-weight: 800;
-            color: #FF9500;
-        }
-        .simulate-status {
-            text-align: center;
-            padding: 10px;
-            border-radius: 20px;
-            font-weight: 700;
-            font-size: 14px;
-        }
-        .simulate-status.pending {
-            background: rgba(255,255,255,0.2);
-            color: white;
-        }
-        .simulate-status.correct {
-            background: #34C759;
-            color: white;
-        }
-        .simulate-status.wrong {
-            background: #FF3B30;
-            color: white;
-        }
         .predict-card {
             background: var(--bg-surface);
             border-radius: var(--radius-2xl);
@@ -404,47 +296,35 @@
             color: var(--accent);
             letter-spacing: 2px;
         }
-        .rec-section {
-            display: flex;
-            gap: 16px;
+        .announcement-drawer {
             margin-bottom: 20px;
+            background: var(--bg-surface);
+            border-radius: var(--radius-2xl);
+            overflow: hidden;
         }
-        .rec-item {
-            flex: 1;
-            background: rgba(52,199,89,0.12);
-            border-radius: 28px;
-            padding: 16px;
-            text-align: center;
-            border: 1px solid rgba(52,199,89,0.3);
+        .announcement-header {
+            padding: 16px 20px;
+            background: rgba(255,184,0,0.1);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            font-weight: 600;
         }
-        .rec-label {
+        .announcement-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s ease;
+            padding: 0 20px;
+            background: var(--bg-surface);
+        }
+        .announcement-content.open {
+            max-height: 300px;
+            padding: 16px 20px;
+        }
+        .announcement-body {
             font-size: 12px;
-            color: var(--text-tertiary);
-            margin-bottom: 8px;
-        }
-        .rec-value {
-            font-size: 28px;
-            font-weight: 800;
-            color: var(--success);
-        }
-        .special-section {
-            background: rgba(191,90,242,0.12);
-            border-radius: 28px;
-            padding: 16px;
-            text-align: center;
-            border: 1px solid rgba(191,90,242,0.3);
-        }
-        .special-label {
-            font-size: 13px;
+            line-height: 1.6;
             color: var(--text-secondary);
-            margin-bottom: 8px;
-        }
-        .special-value {
-            font-size: 22px;
-            font-weight: 700;
-            color: var(--purple);
-            font-family: monospace;
-            letter-spacing: 2px;
         }
         .history-card {
             background: var(--bg-surface);
@@ -494,36 +374,6 @@
         .correct { color: var(--success); font-weight: 600; }
         .wrong { color: var(--error); font-weight: 600; }
         .open-cell { font-size: 11px; line-height: 1.3; }
-        .announcement-drawer {
-            margin-bottom: 20px;
-            background: var(--bg-surface);
-            border-radius: var(--radius-2xl);
-            overflow: hidden;
-        }
-        .announcement-header {
-            padding: 16px 20px;
-            background: rgba(255,184,0,0.1);
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            font-weight: 600;
-        }
-        .announcement-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: max-height 0.4s ease;
-            padding: 0 20px;
-            background: var(--bg-surface);
-        }
-        .announcement-content.open {
-            max-height: 300px;
-            padding: 16px 20px;
-        }
-        .announcement-body {
-            font-size: 12px;
-            line-height: 1.6;
-            color: var(--text-secondary);
-        }
         .bottom-bar {
             position: fixed;
             bottom: 0;
@@ -551,18 +401,18 @@
 </head>
 <body>
     <div class="splash-screen" id="splashScreen">
-        <div class="splash-logo">🎯</div>
-        <h1 class="splash-title">欢迎来到好u免费预测</h1>
-        <p class="splash-subtitle">预测全网最稳 · 智能动态区间</p>
+        <div class="splash-logo">恒</div>
+        <h1 class="splash-title">欢迎来到小恒杀组</h1>
+        <p class="splash-subtitle">智能精准杀号 · 稳定高命中率</p>
         <button class="enter-btn" id="enterBtn">点击进入预测系统</button>
     </div>
     <div class="main-container" id="mainContainer">
         <div class="nav-bar">
             <div class="nav-logo">
-                <div class="logo-icon">🎯</div>
+                <div class="logo-icon">恒</div>
                 <div class="logo-text">
-                    <h1>好u</h1>
-                    <p>预测全网最稳</p>
+                    <h1>小恒杀组</h1>
+                    <p>精准杀号系统</p>
                 </div>
             </div>
             <button class="nav-btn" id="themeBtn">🌓</button>
@@ -573,54 +423,18 @@
                 <div class="status-value" id="currentRange">--</div>
             </div>
             <div class="status-item">
-                <div class="status-label">当前50期命中率</div>
+                <div class="status-label">27期杀中次数</div>
                 <div class="status-value" id="currentAccuracy">--</div>
+            </div>
+            <div class="status-item">
+                <div class="status-label">近10期杀中次数</div>
+                <div class="status-value" id="recentAccuracy">--</div>
             </div>
             <div class="status-item">
                 <div class="status-label">区间切换次数</div>
                 <div class="status-value" id="switchCount">0</div>
             </div>
         </div>
-
-        <!-- 黄色模拟区：完整复刻三组答案 和下方真实生成一模一样 -->
-        <div class="simulate-card">
-            <div class="simulate-header">
-                <h3>🔥 模拟回溯-取倒数29期为当期 完整重算三组</h3>
-                <div class="simulate-hit-count">累计命中：<span id="simulateHitCount">0</span>次</div>
-            </div>
-            <div class="simulate-info">
-                <div class="simulate-info-item">
-                    <div class="simulate-info-label">模拟基准期号(倒数29期)</div>
-                    <div class="simulate-info-value" id="simBasePeriod">--</div>
-                </div>
-                <div class="simulate-info-item">
-                    <div class="simulate-info-label">模拟基准开奖号</div>
-                    <div class="simulate-info-value" id="simBaseOpen">--</div>
-                </div>
-                <div class="simulate-info-item">
-                    <div class="simulate-info-label">回溯目标下期</div>
-                    <div class="simulate-info-value" id="simTargetPeriod">--</div>
-                </div>
-            </div>
-            <!-- 模拟三门池1 -->
-            <div class="sim-kill-section">
-                <div class="sim-label">📌 模拟三门池1</div>
-                <div class="sim-val-main" id="simKill1">--</div>
-            </div>
-            <!-- 模拟三门池2+3 -->
-            <div class="sim-rec-section">
-                <div class="sim-rec-item">
-                    <div class="sim-label">📌 模拟三门池2</div>
-                    <div class="sim-val-sub" id="simKill2">--</div>
-                </div>
-                <div class="sim-rec-item">
-                    <div class="sim-label">📌 模拟三门池3</div>
-                    <div class="sim-val-sub" id="simKill3">--</div>
-                </div>
-            </div>
-            <div class="simulate-status pending" id="simStatus">⏳ 等待回溯开奖验证</div>
-        </div>
-
         <div class="hero-card">
             <div class="hero-header">
                 <span>🎲 最新真实开奖</span>
@@ -635,28 +449,16 @@
             <div class="sum" id="latestSum">和值：-- / --</div>
             <div class="countdown" id="countdown">加载中...</div>
         </div>
-
         <div class="predict-card">
             <div class="card-header">
-                <h3>🔮 真实下期三门池</h3>
+                <h3>🔮 真实下期杀组</h3>
                 <button class="btn-generate" id="generateBtn">✨ 生成预测 ✨</button>
             </div>
             <div class="kill-section">
-                <div class="kill-label">📌 三门池1</div>
+                <div class="kill-label">📌 本期杀组</div>
                 <div class="kill-value" id="killValue">--</div>
             </div>
-            <div class="rec-section">
-                <div class="rec-item">
-                    <div class="rec-label">📌 三门池2</div>
-                    <div class="rec-value" id="rec1">--</div>
-                </div>
-                <div class="rec-item">
-                    <div class="rec-label">📌 三门池3</div>
-                    <div class="rec-value" id="rec2">--</div>
-                </div>
-            </div>
         </div>
-
         <div class="announcement-drawer">
             <div class="announcement-header" id="announcementHeader">
                 <span>📢 系统公告</span>
@@ -664,24 +466,25 @@
             </div>
             <div class="announcement-content" id="announcementContent">
                 <div class="announcement-body">
-                    39fsf.top 注册绑定就送88 截止到4月21号<br>
-                    首次充值100找熊猫哥返现38.8<br>
-                    首次充值可在大厅申请100+100 并且联系熊猫哥866107546 来拿30天卡密<br>
-                    买卖算法认识熊猫28
+                    本页面仅供娱乐，不构成任何投资建议。<br>
+                    理性娱乐，量力而行。<br>
+                    <br>
+                    <strong>【命中规则】</strong><br>
+                    1. 当开奖和值为13或14时，无论杀组是什么，都算杀中。<br>
+                    2. 当开奖和值不为13或14时，开奖结果的类型（小双/小单/大双/大单）与杀组不同，则算杀中。
                 </div>
             </div>
         </div>
-
         <div class="history-card">
             <div class="history-header">
-                <span class="history-title">📜 最近50期自动回测</span>
+                <span class="history-title">📜 最近27期自动回测</span>
                 <button class="nav-btn" id="refreshBacktestBtn" style="width:36px;height:36px;">🔄</button>
             </div>
             <div class="history-accuracy" id="historyAccuracy">回测命中率：<span>--</span></div>
             <div class="table-wrapper">
                  <table>
                     <thead>
-                         <tr><th>期号</th><th>上期开奖</th><th>预测三组</th><th>实际开奖</th><th>命中</th></tr>
+                         <tr><th>期号</th><th>上期开奖</th><th>杀组</th><th>实际开奖</th><th>命中</th></tr>
                     </thead>
                     <tbody id="historyBody">
                          <tr><td colspan="5" style="text-align:center;">回测数据加载中...</td></tr>
@@ -689,16 +492,15 @@
                  </table>
             </div>
         </div>
-        <div class="footer">好u免费预测 · 仅供娱乐</div>
+        <div class="footer">小恒杀组 · 仅供娱乐参考</div>
     </div>
-    <div class="bottom-bar">好u预测 · 全网最稳 · 智能动态区间</div>
-
+    <div class="bottom-bar">小恒杀组 · 智能精准杀号 · 稳定高命中率</div>
     <script>
         const SEQUENCES = [[0,4,6,9,12,15,18,21,24,27],[1,4,7,10,13,16,19,22,25],[2,5,8,11,14,17,20,23,26]];
         const COMBINATION_RULES = {
             sameSequence:{'小双':['小双','大双','大单'],'小单':['小单','大单','大双'],'大双':['大双','小双','小单'],'大单':['大单','小单','小双']},
             diffSequence:{'小双':['小双','小单','大单'],'小单':['小单','小双','大双'],'大双':['大双','大单','小单'],'大单':['大单','大双','小双']},
-            noMatch:{'小双':['小双','小单','大双'],'小单':['小单','小双','大单'],'大双':['大双','小双','大单'],'大单':['大单','大双','小单']}
+            noMatch:{'小双':['小双','小单','大双'],'小单':['小单','小双','大单'],'大双':['大双','小双','大单'],'大单':['大单','大双','小双']}
         };
         function getTypeFromSum(sum){let s=sum<14?'小':'大';let d=sum%2===0?'双':'单';return s+d;}
         function mulberry32(seed){let s=seed;return()=>{s=(s|0)+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,s|1);t^=t+Math.imul(t^t>>>7,t|61);return((t^t>>>14)>>>0)/4294967296;}}
@@ -706,7 +508,6 @@
         function generateFixedRandom(expect,nums){let p=parseInt(expect);let c=nums[0]*100+nums[1]*10+nums[2];let s=p*1000+c;let r=mulberry32(s);let w=currentRange.max-currentRange.min;return Number((r()*w+currentRange.min).toFixed(8));}
         function getSequenceIndexes(num){let arr=[];SEQUENCES.forEach((s,i)=>{if(s.includes(num))arr.push(i);});return arr;}
         function isSameSequence(a,b){let x=getSequenceIndexes(a);let y=getSequenceIndexes(b);return x.some(i=>y.includes(i));}
-        // 原生核心预测函数 完整不动 原样吐出三组
         function predictNextPeriod(nums,exp,sum,type,cus=null){
             let rg=cus||currentRange;
             let p=parseInt(exp);
@@ -726,32 +527,30 @@
             else{rt='无匹配-大小单双组合';gp=COMBINATION_RULES.noMatch[type];}
             return{rnd,pro,dec,dArr,dSum,has,sq,rt,groups:gp};
         }
-
         function generateRangePool(){let arr=[];let s=0.05;let mw=0.2,maw=0.5;for(let mi=0;mi<=0.8;mi+=s){for(let ma=mi+mw;ma<=Math.min(mi+maw,1);ma+=s){arr.push({min:Number(mi.toFixed(2)),max:Number(ma.toFixed(2))});}}return arr;}
         const RANGE_POOL=generateRangePool();
         let switchCount=0;
-        function calculateRangeAccuracy(rg,his){let len=Math.min(50,his.length-1);let ok=0;for(let i=0;i<len;i++){let t=his[i];let p=his[i+1];let res=predictNextPeriod(p.nums,p.expect,p.sum,p.type,rg);let cor=(t.sum===13||t.sum===14)||res.groups.includes(t.type);if(cor)ok++;}let acc=(ok/len)*100;return{range:rg,accuracy:Number(acc.toFixed(2)),ok,total:len};}
+        function calculateRangeAccuracy(rg,his){let len=Math.min(27,his.length-1);let ok=0;for(let i=0;i<len;i++){let t=his[i];let p=his[i+1];let res=predictNextPeriod(p.nums,p.expect,p.sum,p.type,rg);let cor=(t.sum===13||t.sum===14)||res.groups.includes(t.type);if(cor)ok++;}let acc=(ok/len)*100;return{range:rg,accuracy:Number(acc.toFixed(2)),ok,total:len};}
         function autoOptimizeRange(his){
             let all=RANGE_POOL.map(x=>calculateRangeAccuracy(x,his));
-            let tar=all.filter(x=>x.accuracy>=90&&x.accuracy<=97).sort((a,b)=>b.accuracy-a.accuracy);
-            let best;
-            if(tar.length>0)best=tar[0];
-            else{let hh=all.filter(x=>x.accuracy>97).sort((a,b)=>a.accuracy-b.accuracy);let ll=all.filter(x=>x.accuracy<90).sort((a,b)=>b.accuracy-a.accuracy);best=hh.length?hh[0]:ll[0];}
+            let top5=all.sort((a,b)=>b.accuracy-a.accuracy).slice(0,5);
+            let best=top5.sort((a,b)=>{let ra=calculateRangeAccuracy(a.range,his.slice(0,11)).accuracy;let rb=calculateRangeAccuracy(b.range,his.slice(0,11)).accuracy;return rb-ra;})[0];
             let nowAcc=calculateRangeAccuracy(currentRange,his).accuracy;
             let sw=false;
-            if(nowAcc<90||(best.accuracy>nowAcc&&best.accuracy>=90&&best.accuracy<=97)){currentRange=best.range;switchCount++;sw=true;localStorage.setItem('panda_current_range',JSON.stringify(currentRange));localStorage.setItem('panda_switch_count',switchCount);}
+            if(best.accuracy>nowAcc){currentRange=best.range;switchCount++;sw=true;localStorage.setItem('xiaoheng_current_range',JSON.stringify(currentRange));localStorage.setItem('xiaoheng_switch_count',switchCount);}
             return{nowAcc,sw};
         }
-        function updateRangeStatus(acc){
+        function updateRangeStatus(acc,recentAcc){
             $('currentRange').textContent=`${currentRange.min}~${currentRange.max}`;
             let el=$('currentAccuracy');el.textContent=`${acc.toFixed(2)}%`;el.className='status-value';
-            if(acc>=90&&acc<=97)el.classList.add('hit');else if(acc<90)el.classList.add('warn');
+            if(acc>=90)el.classList.add('hit');else if(acc<70)el.classList.add('warn');
+            let rel=$('recentAccuracy');rel.textContent=`${recentAcc.toFixed(2)}%`;rel.className='status-value';
+            if(recentAcc>=90)rel.classList.add('hit');else if(recentAcc<70)rel.classList.add('warn');
             $('switchCount').textContent=switchCount;
         }
-
         let backtestRecords=[];
         function autoBacktestHistory(his){
-            let list=[];let len=Math.min(50,his.length-1);
+            let list=[];let len=Math.min(27,his.length-1);
             for(let i=0;i<len;i++){let t=his[i];let p=his[i+1];let res=predictNextPeriod(p.nums,p.expect,p.sum,p.type);let cor=(t.sum===13||t.sum===14)||res.groups.includes(t.type);list.push({p:p.expect,t:t.expect,pn:p.nums,tn:t.nums,ps:p.sum,ts:t.sum,pt:p.type,tt:t.type,gp:res.groups,ok:cor});}
             backtestRecords=list;let ok=list.filter(x=>x.ok).length;let acc=(ok/list.length*100).toFixed(2);renderBacktest();return Number(acc);
         }
@@ -759,57 +558,13 @@
             let tb=$('historyBody');if(!backtestRecords.length){tb.innerHTML='<tr><td colspan="5" style="text-align:center;">暂无回测数据</td></tr>';$('historyAccuracy').innerHTML=`回测命中率：<span>--</span>`;return;}
             let ok=backtestRecords.filter(x=>x.ok).length;let tot=backtestRecords.length;let acc=(ok/tot*100).toFixed(2);let h='';
             backtestRecords.forEach(x=>{let ppre=`${x.pn.join('+')}=${x.ps}<br>${x.pt}`;let pnow=`${x.tn.join('+')}=${x.ts}<br>${x.tt}`;h+=`<tr><td>${x.t}</td><td class="open-cell">${ppre}</td><td>${x.gp.join(' ')}</td><td class="open-cell">${pnow}</td><td class="${x.ok?'correct':'wrong'}">${x.ok?'✓':'✗'}</td></tr>`;});
-            tb.innerHTML=h;$('historyAccuracy').innerHTML=`最近50期回测命中率：<span>${acc}%</span> (${ok}/${tot})`;
+            tb.innerHTML=h;$('historyAccuracy').innerHTML=`最近27期回测命中率：<span>${acc}%</span> (${ok}/${tot})`;
         }
-
-        // ========== 核心修改：取倒数29期开奖号 当成当前当期 调用原生算法 算出完整三组 ==========
-        let simulateHitCount=0,lastSimPer='';
-        function initSimHit(){try{let s=localStorage.getItem('haou_simulate_hit_count');if(s)simulateHitCount=parseInt(s);}catch(e){simulateHitCount=0;}$('simulateHitCount').textContent=simulateHitCount;}
-        function saveSimHit(){localStorage.setItem('haou_simulate_hit_count',simulateHitCount+'');}
-
-        function runSimCalcFullThree(history){
-            if(history.length<30)return;
-            // 1. 拿【倒数第29期】 人为假装是现在的当期开奖号码
-            let mockNow=history[28];
-            // 2. 它的下一期 就是要验证的目标期
-            let targetPer=(parseInt(mockNow.expect)+1)+'';
-            // 3. 直接调用原生完整预测函数 → 原样算出【完整三组】
-            let ret=predictNextPeriod(mockNow.nums,mockNow.expect,mockNow.sum,mockNow.type);
-            let three=ret.groups;
-
-            // 4. 黄色模拟区 展示完整三组 和下方真实三门池一模一样
-            $('simBasePeriod').textContent=mockNow.expect;
-            $('simBaseOpen').textContent=mockNow.nums.join(',');
-            $('simTargetPeriod').textContent=targetPer;
-            $('simKill1').textContent=three[0]||'--';
-            $('simKill2').textContent=three[1]||'--';
-            $('simKill3').textContent=three[2]||'--';
-
-            // 5. 自动核对下期真实开奖 判断三组命中
-            let realNext=history.find(x=>x.expect===targetPer);
-            let st=$('simStatus');
-            if(realNext){
-                let isOk=(realNext.sum===13||realNext.sum===14)||three.includes(realNext.type);
-                st.className='simulate-status '+(isOk?'correct':'wrong');
-                st.textContent=isOk?'✅ 回溯三组已命中':'❌ 回溯三组未命中';
-                if(targetPer!==lastSimPer){lastSimPer=targetPer;if(isOk){simulateHitCount++;$('simulateHitCount').textContent=simulateHitCount;saveSimHit();}}
-            }else{
-                st.className='simulate-status pending';
-                st.textContent='⏳ 等待回溯目标开奖';
-            }
-            console.log('===== 完全按你要求：倒数29期当作当前当期 原生算法算出完整三组 =====');
-            console.log('模拟顶替当期开奖期号：',mockNow.expect);
-            console.log('模拟顶替当期开奖号码：',mockNow.nums.join(','));
-            console.log('原生算法完整算出三组结果：',three);
-            console.log('=======================================================');
-        }
-
         const API_URL='https://super.pc28998.com/history/JND28';
         const PERIOD_INTERVAL=210;
         let lotteryHistory=[],predictRecords=[],cdTimer=null,autoTimer=null,reqLock=false;
         const $=id=>document.getElementById(id);
         const qs=s=>document.querySelector(s);
-
         function initSplash(){
             let sp=$('splashScreen'),main=$('mainContainer'),btn=$('enterBtn');
             btn.onclick=()=>{sp.classList.add('hidden');setTimeout(()=>main.classList.add('visible'),300);};
@@ -828,13 +583,10 @@
                 let json=await res.json();
                 if(json.code===1&&Array.isArray(json.data)){
                     lotteryHistory=json.data.slice(0,100).map(x=>{let arr=x.opencode.split(',').map(Number);let sum=arr.reduce((a,b)=>a+b,0);return{...x,nums:arr,sum,type:getTypeFromSum(sum)};});
-                    // 原生区间、回测不变
                     let opt=autoOptimizeRange(lotteryHistory);
-                    autoBacktestHistory(lotteryHistory);
-                    updateRangeStatus(opt.nowAcc);
-                    // 【核心】执行：倒数29期当当期 → 原生算法算出完整三组
-                    runSimCalcFullThree(lotteryHistory);
-
+                    let acc=autoBacktestHistory(lotteryHistory);
+                    let recentAcc=calculateRangeAccuracy(currentRange,lotteryHistory.slice(0,11)).accuracy;
+                    updateRangeStatus(opt.nowAcc,recentAcc);
                     upLatest();startCd();
                     if(tip)$('countdown').textContent=opt.sw?'✅ 刷新成功已切区间':'✅ 刷新成功';
                     reqLock=false;return true;
@@ -846,20 +598,19 @@
             let d=lotteryHistory[0];let next=(parseInt(d.expect)+1)+'';
             let ret=predictNextPeriod(d.nums,d.expect,d.sum,d.type);
             let g=ret.groups;
-            $('killValue').textContent=g[0]||'--';$('rec1').textContent=g[1]||'--';$('rec2').textContent=g[2]||'--';
+            $('killValue').textContent=g[0]||'--';
         }
-        function initTheme(){let s=localStorage.getItem('panda_theme');let dk=s==='dark';document.body.dataset.theme=dk?'dark':'light';$('themeBtn').textContent=dk?'☀️':'🌓';}
-        function toggleTheme(){let dk=document.body.dataset.theme==='dark';document.body.dataset.theme=dk?'light':'dark';$('themeBtn').textContent=dk?'🌓':'☀️';localStorage.setItem('panda_theme',dk?'dark':'light');}
+        function initTheme(){let s=localStorage.getItem('xiaoheng_theme');let dk=s==='dark';document.body.dataset.theme=dk?'dark':'light';$('themeBtn').textContent=dk?'☀️':'🌓';}
+        function toggleTheme(){let dk=document.body.dataset.theme==='dark';document.body.dataset.theme=dk?'light':'dark';$('themeBtn').textContent=dk?'🌓':'☀️';localStorage.setItem('xiaoheng_theme',dk?'dark':'light');}
         function initNotice(){let h=qs('#announcementHeader'),c=qs('#announcementContent'),t=qs('#announcementToggle');if(h)h.onclick=()=>{c.classList.toggle('open');t.textContent=c.classList.contains('open')?'▲':'▼';};}
-        function initLocalRg(){try{let r=localStorage.getItem('panda_current_range');let c=localStorage.getItem('panda_switch_count');if(r)currentRange=JSON.parse(r);if(c)switchCount=parseInt(c);}catch(e){}}
+        function initLocalRg(){try{let r=localStorage.getItem('xiaoheng_current_range');let c=localStorage.getItem('xiaoheng_switch_count');if(r)currentRange=JSON.parse(r);if(c)switchCount=parseInt(c);}catch(e){}}
         function bindEvt(){
             $('generateBtn').onclick=makeRealThree;
             $('themeBtn').onclick=toggleTheme;
-            $('refreshBacktestBtn').onclick=()=>{autoBacktestHistory(lotteryHistory);autoOptimizeRange(lotteryHistory);runSimCalcFullThree(lotteryHistory);};
+            $('refreshBacktestBtn').onclick=()=>{autoBacktestHistory(lotteryHistory);autoOptimizeRange(lotteryHistory);};
         }
-
         (async function(){
-            initSplash();initTheme();initNotice();initLocalRg();initSimHit();bindEvt();
+            initSplash();initTheme();initNotice();initLocalRg();bindEvt();
             await fetchData();
             autoTimer=setInterval(fetchData,10000);
         })();
