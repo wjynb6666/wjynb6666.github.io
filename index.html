@@ -3,929 +3,552 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>至尊·ZZ95ND 付费专属版本</title>
+    <title>小恒最新5.12e值双组</title>
     <style>
         * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
+            margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent;
+            -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale;
         }
         :root {
-            --bg: #F2F5F9;
-            --card: rgba(255, 255, 255, 0.65);
-            --card-border: rgba(255, 255, 255, 0.7);
-            --text: #1a1a2e;
-            --text-secondary: #5b5b7a;
-            --accent: #2D7FF9;
-            --danger: #F53F3F;
-            --gold: #f59e0b;
-            --shadow: 0 12px 32px rgba(0, 0, 0, 0.04);
-            --radius: 28px;
-            --success: #10b981;
+            --bg: #121212;
+            --surface: rgba(22, 22, 26, 0.85);
+            --text: #FFFFFF;
+            --text-secondary: #A1A1AA;
+            --gold: #D4AF37;
+            --gold-light: #F0C852;
+            --gold-dark: #B8860B;
+            --rose: #FF4755;
+            --indigo: #7A6FEE;
+            --orange: #FFB447;
+            --teal: #4FD1C5;
+            --success: #22C55E;
+            --shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
+            --radius: 32px;
+            --radius-xl: 40px;
         }
         body {
-            background: var(--bg);
-            font-family: -apple-system, 'Inter', sans-serif;
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
-            color: var(--text);
-            position: relative;
-            overflow-x: hidden;
-        }
-        body::before {
-            content: '';
-            position: fixed;
-            top: -10%;
-            left: -20%;
-            width: 70%;
-            height: 70%;
-            background: radial-gradient(circle at 30% 30%, rgba(45, 127, 249, 0.08) 0%, transparent 65%);
-            z-index: 0;
-            pointer-events: none;
-        }
-        body::after {
-            content: '';
-            position: fixed;
-            bottom: -10%;
-            right: -15%;
-            width: 60%;
-            height: 60%;
-            background: radial-gradient(circle at 70% 60%, rgba(245, 63, 63, 0.06) 0%, transparent 65%);
-            z-index: 0;
-            pointer-events: none;
+            background: linear-gradient(180deg, #0A0A0A 0%, #121212 45%, #161618 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'PingFang SC', sans-serif;
+            min-height: 100vh; color: var(--text);
+            padding: env(safe-area-inset-top) 20px calc(20px + env(safe-area-inset-bottom));
+            display: flex; flex-direction: column; overflow-x: hidden;
         }
         .splash-screen {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100vh;
-            z-index: 9999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(240, 242, 246, 0.75);
-            backdrop-filter: blur(30px);
-            transition: opacity 0.5s ease, transform 0.5s ease;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100vh;
+            background: linear-gradient(180deg, #070707 0%, #121212 100%);
+            z-index: 9999; display: flex; flex-direction: column; align-items: center;
+            justify-content: center; transition: opacity 0.5s ease; cursor: pointer;
         }
-        .splash-screen.hidden {
-            opacity: 0;
-            transform: scale(1.05);
-            pointer-events: none;
-        }
-        .splash-card {
-            width: 100%;
-            max-width: 380px;
-            padding: 40px 28px;
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(25px);
-            border-radius: 36px;
-            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.08);
-            border: 1px solid rgba(255, 255, 255, 0.7);
-            text-align: center;
-        }
-        .splash-icon {
-            width: 70px;
-            height: 70px;
-            margin: 0 auto 20px;
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            border-radius: 22px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 34px;
-            color: white;
-            box-shadow: 0 10px 20px rgba(239, 68, 68, 0.35);
-        }
-        .splash-title {
-            font-size: 24px;
-            font-weight: 800;
-            color: #0f172a;
-            margin-bottom: 6px;
-        }
-        .splash-subtitle {
-            font-size: 14px;
-            color: #64748b;
-            margin-bottom: 28px;
-        }
-        .splash-info {
-            background: rgba(248, 250, 252, 0.8);
-            border-radius: 20px;
-            padding: 18px 20px;
-            margin-bottom: 28px;
-            text-align: left;
-            border: 1px solid rgba(0, 0, 0, 0.04);
-        }
-        .splash-info p {
-            font-size: 13px;
-            color: #334155;
-            margin-bottom: 8px;
-        }
-        .splash-info strong {
-            color: #0f172a;
-            font-weight: 700;
-        }
-        .enter-btn {
-            width: 100%;
-            height: 52px;
-            border: none;
-            border-radius: 18px;
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            color: white;
-            font-size: 16px;
-            font-weight: 700;
-            cursor: pointer;
-            box-shadow: 0 8px 20px rgba(239, 68, 68, 0.35);
-            transition: all 0.2s ease;
-        }
-        .enter-btn:active {
-            transform: scale(0.96);
-        }
-        .app-container {
-            max-width: 420px;
-            width: 100%;
-            position: relative;
-            z-index: 1;
-            opacity: 0;
-            transition: opacity 0.5s ease;
-        }
-        .app-container.visible {
-            opacity: 1;
-        }
-        .nav-bar {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 20px;
-            padding: 0 4px;
-        }
-        .brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .brand-icon {
-            width: 44px;
-            height: 44px;
-            background: linear-gradient(135deg, #ef4444, #dc2626);
-            border-radius: 16px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-            color: white;
-        }
-        .brand-text h2 {
-            font-size: 20px;
-            font-weight: 700;
-        }
-        .brand-text p {
-            font-size: 11px;
-            color: var(--text-secondary);
-        }
-        .refresh-btn {
-            width: 44px;
-            height: 44px;
-            border-radius: 16px;
-            background: var(--card);
-            backdrop-filter: blur(20px);
-            border: 1px solid var(--card-border);
-            font-size: 20px;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--danger);
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.04);
-            transition: all 0.2s ease;
-        }
-        .refresh-btn:active {
-            transform: scale(0.94);
-        }
-        .refresh-btn.loading {
-            animation: spin 0.8s linear infinite;
-        }
-        @keyframes spin {
-            from {
-                transform: rotate(0deg);
-            }
-            to {
-                transform: rotate(360deg);
-            }
-        }
-        .glass-card {
-            background: var(--card);
-            backdrop-filter: blur(25px);
-            border-radius: var(--radius);
-            padding: 22px 20px;
-            margin-bottom: 16px;
-            box-shadow: var(--shadow);
-            border: 1px solid var(--card-border);
-        }
-        .oracle-card {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .balls {
-            display: flex;
-            gap: 8px;
-        }
-        .ball {
-            width: 52px;
-            height: 52px;
-            background: #FFFFFF;
-            border-radius: 26px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            font-weight: 700;
-            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.05);
-        }
-        .countdown-ring {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-        .ring-wrapper {
-            position: relative;
-            width: 80px;
-            height: 80px;
-        }
-        .ring-bg {
-            fill: none;
-            stroke: #e2e8f0;
-            stroke-width: 4;
-        }
-        .ring-progress {
-            fill: none;
-            stroke: var(--danger);
-            stroke-width: 4;
-            stroke-linecap: round;
-            stroke-dasharray: 213.6;
-            transform: rotate(-90deg);
-            transform-origin: 50% 50%;
-        }
-        .ring-text {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            font-size: 18px;
-            font-weight: 700;
-            color: var(--danger);
-        }
-        .core-content {
-            font-size: 17px;
-            font-weight: 600;
-            line-height: 2.2;
-            margin-bottom: 16px;
-        }
-        .core-content span {
-            font-weight: 800;
-            margin-left: 6px;
-        }
-        .kill-highlight {
-            color: var(--danger) !important;
-        }
-        .pool-highlight {
-            color: var(--accent);
-        }
-        .bet-highlight {
+        .splash-screen.hidden { opacity: 0; pointer-events: none; }
+        .splash-logo {
+            width: 90px; height: 90px;
+            background: linear-gradient(135deg, #1A1A1D, #242429);
+            border-radius: 28px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 44px; font-weight: 900;
             color: var(--gold);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4), 0 0 12px rgba(212,175,55,0.15);
+            margin-bottom: 24px;
+            border: 1px solid rgba(212,175,55,0.2);
         }
-        .format-selector {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 12px;
+        .splash-name { font-size: 26px; font-weight: 800; margin-bottom: 6px; color: var(--gold-light); }
+        .splash-sub { color: var(--text-secondary); font-size: 14px; font-weight: 600; margin-bottom: 40px; }
+        .splash-info {
+            background: rgba(25,25,30,0.7);
+            border-radius: 20px; padding: 16px 24px;
+            margin-bottom: 36px; text-align: center;
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(212,175,55,0.12);
+            box-shadow: 0 4px 16px rgba(0,0,0,0.25);
         }
+        .splash-info p { color: var(--text-secondary); font-size: 12px; line-height: 1.6; }
+        .splash-info strong { color: var(--gold); font-weight: 700; }
+        .splash-progress-wrap { width: 180px; text-align: center; }
+        .splash-progress-bg { width: 100%; height: 4px; background: #2A2A2F; border-radius: 2px; overflow: hidden; margin-bottom: 8px; }
+        .splash-progress-fill { height: 4px; background: var(--gold); border-radius: 2px; transition: width 0.08s linear; width: 0%; }
+        .splash-progress-text { font-size: 12px; color: var(--text-secondary); font-weight: 600; }
+        .brand { text-align: center; padding: 12px 0 16px; }
+        .brand-name { font-size: 15px; font-weight: 800; letter-spacing: 2px; color: var(--gold); }
+        .brand-sub { font-size: 11px; color: var(--text-secondary); opacity: 0.7; margin-top: 2px; font-weight: 600; }
+        .stage { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 38vh; padding: 10px 0; }
+        .draw-label { font-size: 12px; font-weight: 700; color: var(--text-secondary); letter-spacing: 1px; margin-bottom: 20px; }
+        .draw-orb-group { display: flex; gap: 20px; margin-bottom: 20px; }
+        .draw-orb {
+            width: 88px; height: 88px; border-radius: 50%;
+            background: linear-gradient(135deg, #1E1E24, #292932);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 36px; font-weight: 800;
+            color: var(--gold-light);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.35), 0 0 10px rgba(212,175,55,0.12);
+            border: 1px solid rgba(212,175,55,0.2);
+            animation: orbFloat 4s ease-in-out infinite;
+        }
+        .draw-orb:nth-child(2) { animation-delay: -1.3s; }
+        .draw-orb:nth-child(3) { animation-delay: -2.6s; }
+        @keyframes orbFloat { 0%,100%{ transform:translateY(0); } 50%{ transform:translateY(-6px); } }
+        .draw-meta { font-size: 16px; color: var(--text-secondary); font-weight: 600; text-align: center; }
+        .draw-meta span { color: var(--gold); font-weight: 800; margin: 0 4px; }
+        .satellites { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-top: 28px; width: 100%; max-width: 480px; }
+        .satellite {
+            aspect-ratio: 1; border-radius: 24px; display: flex; flex-direction: column; align-items: center;
+            justify-content: center; backdrop-filter: blur(20px);
+            border: 1px solid rgba(212,175,55,0.15);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.25); padding: 8px;
+            background: rgba(22,22,28,0.6);
+        }
+        .sat-rose { background: linear-gradient(135deg, rgba(255,71,85,0.12), rgba(255,71,85,0.04)); }
+        .sat-indigo { background: linear-gradient(135deg, rgba(122,111,238,0.12), rgba(122,111,238,0.04)); }
+        .sat-orange { background: linear-gradient(135deg, rgba(255,180,71,0.12), rgba(255,180,71,0.04)); }
+        .sat-green { background: linear-gradient(135deg, rgba(34,197,94,0.12), rgba(34,197,94,0.04)); }
+        .sat-value { font-size: clamp(14px, 4vw, 18px); font-weight: 800; text-align: center; white-space: nowrap; }
+        .sat-rose .sat-value { color: var(--rose); }
+        .sat-indigo .sat-value { color: var(--indigo); }
+        .sat-orange .sat-value { color: var(--orange); }
+        .sat-green .sat-value { color: var(--success); }
+        .sat-label { font-size: 11px; font-weight: 700; color: var(--text-secondary); margin-top: 6px; }
+        .dock {
+            background: var(--surface);
+            backdrop-filter: blur(30px);
+            border-radius: var(--radius-xl);
+            padding: 24px 20px;
+            margin-top: auto;
+            box-shadow: 0 12px 40px rgba(0,0,0,0.35);
+            border: 1px solid rgba(212,175,55,0.18);
+        }
+        .dock-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+        .dock-countdown { font-size: 28px; font-weight: 800; color: var(--gold); }
+        .dock-countdown-label { font-size: 12px; color: var(--text-secondary); font-weight: 700; }
+        .format-selector { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
         .format-selector select {
-            padding: 8px 16px;
-            border-radius: 20px;
-            border: 1px solid rgba(0, 0, 0, 0.1);
+            padding: 8px 16px; border-radius: 20px;
+            border: 1px solid rgba(212,175,55,0.25);
             font-weight: 600;
-            background: white;
+            background: #1A1A20;
             outline: none;
+            font-size: 13px;
+            color: var(--gold-light);
         }
-        .copy-row {
-            display: flex;
-            gap: 8px;
-            align-items: center;
-            background: rgba(255, 255, 255, 0.6);
-            border-radius: 20px;
-            padding: 5px;
+        .scheme-strip { display: flex; gap: 12px; margin-bottom: 16px; }
+        .scheme-text {
+            flex: 1; background: rgba(25,25,32,0.8);
+            border-radius: 20px; padding: 14px 18px;
+            font-size: 15px; font-weight: 700;
+            border: 1px solid rgba(212,175,55,0.2);
+            outline: none; color: var(--gold-light);
         }
-        .copy-input {
-            flex: 1;
-            background: transparent;
-            border: none;
-            padding: 10px 14px;
-            font-size: 14px;
-            font-weight: 600;
-            outline: none;
+        .scheme-btn {
+            width: 48px; height: 48px; border-radius: 50%;
+            background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+            color: #121212;
+            border: none; font-size: 18px;
+            display: flex; align-items: center; justify-content: center;
+            cursor: pointer; transition: transform 0.2s;
+            box-shadow: 0 4px 12px rgba(212,175,55,0.3);
         }
-        .copy-btn {
-            width: 44px;
-            height: 44px;
-            border-radius: 16px;
-            background: var(--danger);
-            border: none;
-            color: white;
-            font-size: 18px;
+        .scheme-btn:active { transform: scale(0.9); }
+        .scheme-btn.success { background: linear-gradient(135deg, #22C55E, #10b981); color:#fff; }
+        .dock-pills { display: flex; gap: 8px; flex-wrap: wrap; justify-content: center; }
+        .dock-pill {
+            padding: 8px 16px; border-radius: 16px;
+            background: rgba(212,175,55,0.12);
+            font-size: 14px; font-weight: 700;
+            color: var(--gold-light);
+            border: 1px solid rgba(212,175,55,0.2);
+        }
+        .history-trigger { text-align: center; padding: 20px 16px 16px; font-size: 13px; font-weight: 700; color: var(--gold); cursor: pointer; }
+        .history-panel {
+            position: fixed; bottom: 0; left: 0; right: 0;
+            background: rgba(18,18,22,0.95);
+            backdrop-filter: blur(40px);
+            border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+            padding: 24px 20px calc(24px + env(safe-area-inset-bottom));
+            box-shadow: 0 -8px 40px rgba(0,0,0,0.4);
+            transform: translateY(100%);
+            transition: transform 0.4s cubic-bezier(0.32,0.72,0,1);
+            max-height: 75vh; overflow-y: auto; z-index: 100;
+            border-top: 1px solid rgba(212,175,55,0.2);
+        }
+        .history-panel.open { transform: translateY(0); }
+        .history-panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .history-panel-title { font-size: 20px; font-weight: 800; color:var(--gold-light); }
+        .history-panel-close {
+            width: 32px; height: 32px; border-radius: 50%;
+            background: rgba(255,255,255,0.08);
+            border: none; font-size: 16px;
+            color:var(--gold);
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.2s ease;
         }
-        .copy-btn:active {
-            transform: scale(0.94);
-        }
-        .copy-btn.success {
-            background: var(--success);
-        }
-        .history-table {
-            width: 100%;
-            border-collapse: collapse;
-            font-size: 12px;
-        }
+        .history-table { width: 100%; border-collapse: collapse; font-size: 12px; color:var(--text-secondary); }
         .history-table th {
-            padding: 10px 6px;
-            background: rgba(255, 255, 255, 0.6);
+            padding: 10px 6px; background: rgba(28,28,36,0.6);
             font-weight: 600;
-            color: var(--text-secondary);
-            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            color: var(--gold);
+            border-bottom: 1px solid rgba(212,175,55,0.2);
         }
         .history-table td {
-            padding: 8px 6px;
-            text-align: center;
-            border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+            padding: 8px 6px; text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            color:var(--text);
         }
-        .badge-green {
-            color: #10b981;
-            font-weight: 700;
-        }
-        .badge-red {
-            color: var(--danger);
-            font-weight: 700;
-        }
+        .badge-green { color: #22C55E; font-weight: 700; }
+        .badge-red { color: #FF4755; font-weight: 700; }
+        body { -webkit-user-select: none; user-select: none; }
     </style>
 </head>
 <body>
     <div class="splash-screen" id="splashScreen">
-        <div class="splash-card">
-            <div class="splash-icon">🍁</div>
-            <h1 class="splash-title">小恒·JNDyc3 付费专属版本</h1>
-            <p class="splash-subtitle">小恒专属算法 · 双引擎杀组协同</p>
-            <div class="splash-info">
-                <p>小恒·JNDyc3付费版本 禁止倒卖盗版</p>
-                <p><strong>加拿大交流群：</strong>4224022</p>
-                <p><strong>专属客服：</strong>4224022</p>
-            </div>
-            <button class="enter-btn" id="enterBtn">立即进入</button>
+        <div class="splash-logo">恒</div>
+        <div class="splash-name">小恒最新5.12e值双组</div>
+        <div class="splash-sub"></div>
+        <div class="splash-info">
+            <p>智能追冷 · 动态窗口 · 混合公式</p>
+            <p><strong>加拿大交流群：</strong>4833463408</p>
+            <p><strong>专属客服：</strong>988500263</p>
+            <p style="margin-top:4px;">有事找旺旺处理</p>
+        </div>
+        <div class="splash-progress-wrap">
+            <div class="splash-progress-bg"><div class="splash-progress-fill" id="progressFill"></div></div>
+            <div class="splash-progress-text" id="progressText">正在加载数据...</div>
         </div>
     </div>
-    <div class="app-container" id="appContainer">
-        <div class="nav-bar">
-            <div class="brand">
-                <div class="brand-icon">🍁</div>
-                <div class="brand-text">
-                    <h2>小恒·JNDyc3 付费专属版</h2>
-                    <p>双引擎 · 实时同步加拿大</p>
-                </div>
-            </div>
-            <button class="refresh-btn" id="refreshBtn">🔄</button>
+    <div class="brand">
+        <div class="brand-name">小恒最新5.12e值双组</div>
+        <div class="brand-sub">智能追冷预测系统</div>
+    </div>
+    <div class="stage">
+        <div class="draw-label">最新开奖</div>
+        <div class="draw-orb-group">
+            <div class="draw-orb" id="ball1">-</div>
+            <div class="draw-orb" id="ball2">-</div>
+            <div class="draw-orb" id="ball3">-</div>
         </div>
-        <div class="glass-card oracle-card">
+        <div class="draw-meta">
+            第<span id="latestPeriod">----</span>期 · 和值<span id="latestSum">--</span> · <span id="latestType">--</span>
+        </div>
+        <div class="satellites">
+            <div class="satellite sat-rose"><div class="sat-value" id="killText">--</div><div class="sat-label">杀组</div></div>
+            <div class="satellite sat-indigo"><div class="sat-value" id="poolText">--</div><div class="sat-label">三门池</div></div>
+            <div class="satellite sat-orange"><div class="sat-value" id="betText">--</div><div class="sat-label">推荐</div></div>
+            <div class="satellite sat-green"><div class="sat-value" id="randId">--</div><div class="sat-label">最冷路径</div></div>
+        </div>
+    </div>
+    <div class="dock">
+        <div class="dock-row">
             <div>
-                <div style="font-size:12px;font-weight:600;color:var(--text-secondary);">🎲 最新开奖</div>
-                <div class="balls">
-                    <div class="ball" id="ball1">--</div>
-                    <div class="ball" id="ball2">--</div>
-                    <div class="ball" id="ball3">--</div>
-                </div>
-                <div style="font-size:13px;margin-top:8px;">
-                    <strong id="latestPeriod" style="color:var(--danger);">----期</strong>
-                    <span id="latestSum">和值 -- / --</span>
-                </div>
-            </div>
-            <div class="countdown-ring">
-                <div class="ring-wrapper">
-                    <svg width="80" height="80" viewBox="0 0 80 80">
-                        <circle class="ring-bg" cx="40" cy="40" r="34"></circle>
-                        <circle class="ring-progress" id="countdownCircle" cx="40" cy="40" r="34"></circle>
-                    </svg>
-                    <div class="ring-text" id="countdownText">--</div>
-                </div>
-                <div style="font-size:11px;color:var(--text-secondary);">下一期</div>
+                <div class="dock-countdown" id="countdownText">--:--</div>
+                <div class="dock-countdown-label">下一期</div>
             </div>
         </div>
-        <div class="glass-card">
-            <div class="core-content">
-                <div>杀组：<span class="kill-highlight" id="killText">--</span></div>
-                <div>三门池：<span class="pool-highlight" id="poolText">--</span></div>
-                <div>双组推荐：<span class="bet-highlight" id="betText">--</span></div>
-            </div>
-            <div class="format-selector">
-                <select id="formatSelect">
-                    <option value="0">默认格式</option>
-                    <option value="1">斜杠分隔</option>
-                    <option value="2">纯双组/三组</option>
-                    <option value="3">带期号</option>
-                    <option value="4">三组转双组</option>
-                </select>
-            </div>
-            <div class="copy-row">
-                <input type="text" class="copy-input" id="recordText" readonly value="等待数据加载...">
-                <button class="copy-btn" id="copyBtn">📋</button>
-            </div>
+        <div class="format-selector">
+            <select id="formatSelect">
+                <option value="0">默认格式</option>
+                <option value="1">斜杠分隔</option>
+                <option value="2">纯双组/三组</option>
+                <option value="3">带期号</option>
+                <option value="4">三组转双组</option>
+            </select>
         </div>
-        <div class="glass-card">
-            <h3 style="margin-bottom:14px;">📊 特码参考</h3>
-            <div id="specialCodesContainer" style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;"></div>
+        <div class="scheme-strip">
+            <input type="text" class="scheme-text" id="recordText" readonly value="等待数据加载...">
+            <button class="scheme-btn" id="copyBtn">📋</button>
         </div>
-        <div class="glass-card" style="max-height:440px;overflow-y:auto;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;">
-                <h3>📜 验证记录</h3>
-                <button id="clearHistoryBtn" style="background:none;border:none;color:var(--danger);cursor:pointer;font-size:13px;">清空</button>
-            </div>
-            <table class="history-table">
-                <thead>
-                    <tr>
-                        <th>期号</th>
-                        <th>开奖</th>
-                        <th>杀组</th>
-                        <th>推荐</th>
-                        <th>数量</th>
-                        <th>杀中</th>
-                        <th>池中</th>
-                    </tr>
-                </thead>
-                <tbody id="historyBody">
-                    <tr><td colspan="7">暂无记录</td></tr>
-                </tbody>
-            </table>
+        <div class="dock-pills" id="specialCodesContainer"></div>
+    </div>
+    <div class="history-trigger" id="historyTrigger">查看验证记录 ↓</div>
+    <div class="history-panel" id="historyPanel">
+        <div class="history-panel-header">
+            <div class="history-panel-title">验证记录</div>
+            <button class="history-panel-close" id="historyClose">✕</button>
         </div>
-        <div style="text-align:center;margin-top:24px;font-size:11px;color:var(--text-secondary);">小恒·JNDyc3付费版本 · 双引擎 · 仅供参考</div>
+        <table class="history-table">
+            <thead>
+                <tr>
+                    <th>期号</th><th>开奖</th><th>杀组</th><th>推荐</th><th>数量</th><th>路径</th><th>杀中</th><th>池中</th>
+                </tr>
+            </thead>
+            <tbody id="historyBody"><tr><td colspan="8">暂无记录</td></tr></tbody>
+        </table>
     </div>
     <script>
         document.oncontextmenu = () => false;
-        document.onkeydown = e => {
-            if (e.key === "F12" || (e.ctrlKey && e.shiftKey && e.key === "I")) return false;
-        };
-
-        (function() {
-            document.getElementById('splashScreen').addEventListener('click', function(e) {
-                if (e.target === this || e.target.id === 'enterBtn') {
-                    this.classList.add('hidden');
-                    document.getElementById('appContainer').classList.add('visible');
-                    initApp();
-                }
-            });
-            const $ = id => document.getElementById(id);
-            const DRAW_PERIOD = 210;
-            const API_URL = 'https://super.pc28998.com/history/JND28';
-            const CORS_PROXIES = [
-                { url: 'https://api.allorigins.win/raw?url=' },
-                { url: 'https://api.codetabs.com/v1/proxy?quest=' }
-            ];
-            const STORAGE_KEY = 'xiexiaoyu_jndyc3_pay_v9';
-            const MOON_EYE_GROUPS = { '月': [9, 12, 15, 18], '之': [7, 10, 16, 19], '眼': [8, 11, 17, 20] };
-            const ALL_SHAPES = ['小单', '小双', '大单', '大双'];
-
-            function getTypeFromSum(sum) {
-                let size = sum >= 14 ? '大' : '小';
-                let parity = sum % 2 === 0 ? '双' : '单';
-                return size + parity;
-            }
-
-            // ==================== 确定随机数生成器（替换Math.random） ====================
-            function mulberry32(seed) {
-                let s = seed | 0;
-                return function() {
-                    s = (s + 0x6D2B79F5) | 0;
-                    let t = Math.imul(s ^ s >>> 15, s | 1);
-                    t ^= t + Math.imul(t ^ t >>> 7, t | 61);
-                    return ((t ^ t >>> 14) >>> 0) / 4294967296;
-                };
-            }
-
-            function seedFromData(expect, nums, sum) {
-                const str = `${expect}_${nums.join('_')}_${sum}`;
-                let hash = 0;
-                for (let i = 0; i < str.length; i++) {
-                    hash = ((hash << 5) - hash) + str.charCodeAt(i);
-                    hash |= 0;
-                }
-                return hash;
-            }
-
-            // ==================== 引擎一：景天MLP（确定种子版本） ====================
-            class MLP {
-                constructor(inputSize, hiddenSize, outputSize, randFn) {
-                    this.inputSize = inputSize;
-                    this.hiddenSize = hiddenSize;
-                    this.outputSize = outputSize;
-                    this.W1 = Array(inputSize).fill().map(() => Array(hiddenSize).fill().map(() => (randFn() - 0.5) * Math.sqrt(
-                        2 / inputSize)));
-                    this.b1 = Array(hiddenSize).fill(0);
-                    this.W2 = Array(hiddenSize).fill().map(() => Array(outputSize).fill().map(() => (randFn() - 0.5) * Math.sqrt(
-                        2 / hiddenSize)));
-                    this.b2 = Array(outputSize).fill(0);
-                }
-                relu(x) { return Math.max(0, x); }
-                reluDeriv(x) { return x > 0 ? 1 : 0; }
-                softmax(logits) {
-                    const max = Math.max(...logits);
-                    const exps = logits.map(v => Math.exp(v - max));
-                    const sum = exps.reduce((a, b) => a + b, 0);
-                    return exps.map(v => v / sum);
-                }
-                forward(x) {
-                    this.z1 = this.b1.map((b, j) => { let s = b; for (let i = 0; i < this.inputSize; i++) s += x[i] * this
-                            .W1[i][j]; return s; });
-                    this.a1 = this.z1.map(z => this.relu(z));
-                    this.z2 = this.b2.map((b, k) => { let s = b; for (let j = 0; j < this.hiddenSize; j++) s += this.a1[j] *
-                            this.W2[j][k]; return s; });
-                    return this.softmax(this.z2);
-                }
-                trainOne(x, y, lr) {
-                    const p = this.forward(x);
-                    const dz2 = p.map((v, i) => v - y[i]);
-                    const da1 = Array(this.hiddenSize).fill(0);
-                    for (let j = 0; j < this.hiddenSize; j++)
-                        for (let k = 0; k < this.outputSize; k++) { this.W2[j][k] -= lr * this.a1[j] * dz2[k];
-                            da1[j] += dz2[k] * this.W2[j][k]; }
-                    for (let k = 0; k < this.outputSize; k++) this.b2[k] -= lr * dz2[k];
-                    const dz1 = da1.map((v, j) => v * (this.z1[j] > 0 ? 1 : 0));
-                    for (let i = 0; i < this.inputSize; i++)
-                        for (let j = 0; j < this.hiddenSize; j++) this.W1[i][j] -= lr * x[i] * dz1[j];
-                    for (let j = 0; j < this.hiddenSize; j++) this.b1[j] -= lr * dz1[j];
-                }
-                train(X, Y, epochs, lr) { for (let e = 0; e < epochs; e++)
-                        for (let i = 0; i < X.length; i++) this.trainOne(X[i], Y[i], lr); }
-            }
-
-            function extractFeatures(historyData, lookback = 10) {
-                if (historyData.length < lookback) return null;
-                const f = [];
-                for (let i = 0; i < lookback; i++) { const idx = ALL_SHAPES.indexOf(historyData[i].type); for (let j = 0; j <
-                        4; j++) f.push(j === idx ? 1 : 0); }
-                for (let i = 0; i < lookback; i++) f.push(historyData[i].sum / 27);
-                const stat = { '小单': 0, '小双': 0, '大单': 0, '大双': 0 };
-                for (let i = 0; i < Math.min(5, historyData.length); i++) stat[historyData[i].type] += 1;
-                for (let s of ALL_SHAPES) f.push(stat[s] / 5);
-                return f;
-            }
-
-            let mlpModel = null;
-            let modelTrained = false;
-
-            function trainMLP(historyData) {
-                if (modelTrained || historyData.length < 11) return false;
-                const latest = historyData[0];
-                const seed = seedFromData(latest.expect, latest.nums, latest.sum);
-                const randFn = mulberry32(seed);
-
-                const X = [],
-                    Y = [];
-                for (let i = 10; i < historyData.length; i++) {
-                    const feat = extractFeatures(historyData.slice(i - 10, i), 10);
-                    if (!feat) continue;
-                    const idx = ALL_SHAPES.indexOf(historyData[i].type);
-                    const oh = [0, 0, 0, 0];
-                    oh[idx] = 1;
-                    X.push(feat);
-                    Y.push(oh);
-                }
-                if (X.length < 20) return false;
-                const inputDim = X[0].length;
-                mlpModel = new MLP(inputDim, 32, 4, randFn);
-                mlpModel.train(X, Y, 100, 0.01);
-                modelTrained = true;
-                return true;
-            }
-
-            function getJingTianThree(historyData) {
-                if (!modelTrained || historyData.length < 10) {
-                    const freq = {};
-                    historyData.forEach(item => freq[item.type] = (freq[item.type] || 0) + 1);
-                    return ALL_SHAPES.sort((a, b) => (freq[b] || 0) - (freq[a] || 0)).slice(0, 3);
-                }
-                const feat = extractFeatures(historyData.slice(0, 10), 10);
-                if (!feat) return ALL_SHAPES.slice(0, 3);
-                const probs = mlpModel.forward(feat);
-                return [0, 1, 2, 3].sort((a, b) => probs[b] - probs[a]).slice(0, 3).map(i => ALL_SHAPES[i]);
-            }
-
-            function getKillFromJingTian(three) {
-                return ALL_SHAPES.find(s => !three.includes(s)) || '--';
-            }
-
-            // ==================== 引擎二：三层筛选 → 三门池 ====================
-            const SIZE_COMBO = {
-                '小单': ['小单', '小双', '大双'],
-                '小双': ['小双', '小单', '大单'],
-                '大单': ['大单', '大双', '小双'],
-                '大双': ['大双', '大单', '小单']
+        document.onkeydown = e => { if(e.key === "F12" || (e.ctrlKey && e.shiftKey && e.key === "I")) return false; };
+        const $ = id => document.getElementById(id);
+        const DRAW_PERIOD = 210;
+        const STORAGE_KEY = 'xiaoheng_512e_double_v1';
+        const MOON_EYE_GROUPS = { '月': [9,12,15,18], '之': [7,10,16,19], '眼': [8,11,17,20] };
+        const RAND_COUNT = 5;
+        function getTypeFromSum(sum) { return (sum >= 14 ? '大' : '小') + (sum % 2 === 0 ? '双' : '单'); }
+        function calcHexKill(history) {
+            if (history.length < 5) return '--';
+            const fiveSum = history.slice(0, 5).map(item => item.sum);
+            const joinStr = fiveSum.map(n => String(n).padStart(2, '0')).join('');
+            try {
+                const decimalNum = BigInt(joinStr);
+                const hex = decimalNum.toString(16).toUpperCase();
+                const pureNum = hex.replace(/[^0-9]/g, '');
+                const threeNum = pureNum.padEnd(3, '0').slice(0, 3);
+                const total = threeNum.split('').reduce((a, b) => Number(a) + Number(b), 0);
+                return getTypeFromSum(total);
+            } catch (e) { return '--'; }
+        }
+        function mulberry32(seed) {
+            let s = seed | 0;
+            return function() {
+                s = (s + 0x6D2B79F5) | 0;
+                let t = Math.imul(s ^ s >>> 15, s | 1);
+                t ^= t + Math.imul(t ^ t >>> 7, t | 61);
+                return ((t ^ t >>> 14) >>> 0) / 4294967296;
             };
+        }
+        function getRandByIndex(expect, nums, sum, index, fallback = false) {
+            const seedStr = `${expect}_${nums.join('')}_${sum}_${index}`;
+            let hash = 0;
+            for (let i = 0; i < seedStr.length; i++) {
+                hash = ((hash << 5) - hash) + seedStr.charCodeAt(i);
+                hash |= 0;
+            }
+            const rng = mulberry32(hash);
+            if (fallback) return rng();
+            for (let attempt = 0; attempt < 50; attempt++) {
+                const raw = rng();
+                const str = raw.toFixed(9).replace(/0+$/, '');
+                const dotIdx = str.indexOf('.');
+                const len = dotIdx >= 0 ? str.length - dotIdx - 1 : 0;
+                if (len >= 6 && len <= 9) {
+                    const acceptRand = rng();
+                    if (len === 8 && acceptRand < 0.65) return raw;
+                    if (len === 7 && acceptRand < 0.35) return raw;
+                    if (len === 6 && acceptRand < 0.08) return raw;
+                    if (len === 9 && acceptRand < 0.08) return raw;
+                }
+            }
+            return rng();
+        }
+        function getFormulaType(randId) {
+            if (randId < 2) return 'A';
+            if (randId < 4) return 'B';
+            return 'C';
+        }
+        function getThreeDoorByFormula(R, sum, formulaType) {
+            let result;
+            if (formulaType === 'B') {
+                result = (R * sum) / 3;
+            } else if (formulaType === 'C') {
+                result = R + sum * Math.PI;
+            } else {
+                result = R * 3 - sum;
+            }
+            const absResult = Math.abs(result);
+            const decimalStr = absResult.toFixed(10).split('.')[1] || '0000000000';
+            const d1 = parseInt(decimalStr[0]);
+            const d2 = parseInt(decimalStr[1]);
+            const d3_raw = parseInt(decimalStr[2]);
+            const d4 = parseInt(decimalStr[3]);
+            const d3 = d4 >= 5 ? d3_raw + 1 : d3_raw;
+            const baseSum = d1 + d2 + d3;
+            const baseType = getTypeFromSum(baseSum);
             const SD_COMBO = {
                 '小单': ['小单', '大单', '大双'],
                 '小双': ['小双', '大双', '大单'],
                 '大单': ['大单', '小单', '小双'],
                 '大双': ['大双', '小双', '小单']
             };
-            const SIZE_SD_COMBO = {
-                '小单': ['小单', '小双', '大单'],
-                '小双': ['小双', '大双', '大单'],
-                '大单': ['大单', '大双', '小单'],
-                '大双': ['大双', '大单', '小双']
+            return SD_COMBO[baseType] || [baseType];
+        }
+        function getBestRandId(history) {
+            if (history.length < 12) return 0;
+            let windowSize = 27;
+            if (history.length >= 20) {
+                const recent10 = [];
+                for (let i = 1; i <= 10; i++) {
+                    const testR = getRandByIndex(history[i].expect, history[i].nums, history[i].sum, 0, true);
+                    const threeDoor = getThreeDoorByFormula(testR, history[i].sum, 'A');
+                    const kill = calcHexKill(history.slice(i));
+                    const finalBet = threeDoor.includes(kill) ? threeDoor.filter(t => t !== kill) : threeDoor;
+                    const is13or14 = (history[i-1]?.sum === 13 || history[i-1]?.sum === 14);
+                    const hit = is13or14 || finalBet.includes(history[i-1]?.type);
+                    recent10.push(hit ? 1 : 0);
+                }
+                const avg = recent10.reduce((a,b)=>a+b,0) / recent10.length;
+                const variance = recent10.reduce((a,b)=>a+Math.pow(b-avg,2),0) / recent10.length;
+                if (variance > 0.15) windowSize = 10;
+            }
+            const scores = new Array(RAND_COUNT).fill(0);
+            const shortScores = new Array(RAND_COUNT).fill(0);
+            const historyBase = new Array(RAND_COUNT).fill(0);
+            const recentBase = new Array(RAND_COUNT).fill(0);
+            for (let i = 1; i <= Math.min(windowSize, history.length - 1); i++) {
+                const current = history[i];
+                const nextRealType = history[i-1].type;
+                const is13or14 = (history[i-1].sum === 13 || history[i-1].sum === 14);
+                for (let id = 0; id < RAND_COUNT; id++) {
+                    const R = getRandByIndex(current.expect, current.nums, current.sum, id, true);
+                    const formulaType = getFormulaType(id);
+                    const threeDoor = getThreeDoorByFormula(R, current.sum, formulaType);
+                    const kill = calcHexKill(history.slice(i));
+                    const finalBet = threeDoor.includes(kill) ? threeDoor.filter(t => t !== kill) : threeDoor;
+                    const hit = is13or14 || finalBet.includes(nextRealType);
+                    if (hit) scores[id]++;
+                    if (i <= 5) { if (hit) shortScores[id]++; }
+                    else { if (hit) historyBase[id]++; }
+                }
+            }
+            let bestId = 0;
+            let bestScore = Infinity;
+            for (let i = 0; i < RAND_COUNT; i++) {
+                const longAcc = windowSize > 5 ? (scores[i] - shortScores[i]) / (windowSize - 5) : 0;
+                const shortAcc = shortScores[i] / Math.min(5, windowSize);
+                const coolScore = (longAcc - shortAcc) * 10 + (1 - shortAcc) * 5;
+                if (coolScore < bestScore) {
+                    bestScore = coolScore;
+                    bestId = i;
+                }
+            }
+            return bestId;
+        }
+        function generateSpecials(finalBet) {
+            if (!finalBet || finalBet.length === 0) return [];
+            let selected = new Set();
+            for (let rec of finalBet) {
+                for (let nums of Object.values(MOON_EYE_GROUPS)) {
+                    for (let num of nums) if (getTypeFromSum(num) === rec) selected.add(num);
+                }
+            }
+            let specials = Array.from(selected).sort((a,b)=>a-b);
+            const maxCount = finalBet.length === 2 ? 4 : 6;
+            specials = specials.slice(0, maxCount);
+            while (specials.length < maxCount) {
+                let all = Object.values(MOON_EYE_GROUPS).flat();
+                for (let n of all) if (!specials.includes(n)) { specials.push(n); if (specials.length >= maxCount) break; }
+            }
+            return specials.map(n => String(n).padStart(2,'0'));
+        }
+        function generateRecordText(kill, threeDoor, finalBet, format, expect) {
+            const finalStr = finalBet.join('');
+            const threeStr = threeDoor.join('');
+            switch(format) {
+                case '1': return `杀${kill}/${finalStr}/13/14`;
+                case '2': return finalBet.length===2 ? `${finalBet.join('/')}13/14` : `${finalStr}13/14`;
+                case '3': return `${expect||'----'}/杀${kill}🉐${finalStr}13/14`;
+                case '4': const d = threeDoor.filter(t => t !== kill); return `${threeStr}${d.length===2?'＝':'='}${d.join('')}13/14`;
+                default: return `杀${kill}🉐${finalStr} 13/14`;
+            }
+        }
+        function loadRecords() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY)||'[]'); } catch(e) { return []; } }
+        function saveRecords(records) { localStorage.setItem(STORAGE_KEY, JSON.stringify(records)); }
+        function verifyOpenedRecord(latestDraw) {
+            let records = loadRecords();
+            const idx = records.findIndex(r => r.expect === latestDraw.expect && r.status === 'pending');
+            if (idx === -1) return;
+            const is13or14 = (latestDraw.sum === 13 || latestDraw.sum === 14);
+            records[idx] = {
+                ...records[idx], status: 'verified', nums: latestDraw.nums, sum: latestDraw.sum, type: latestDraw.type,
+                killCorrect: is13or14 ? true : (records[idx].kill !== latestDraw.type),
+                poolCorrect: is13or14 ? true : records[idx].finalBet.includes(latestDraw.type)
             };
-            const TABLES = [
-                { name: '大小', fn: (bt) => SIZE_COMBO[bt] || [bt] },
-                { name: '单双', fn: (bt) => SD_COMBO[bt] || [bt] },
-                { name: '大小单双', fn: (bt) => SIZE_SD_COMBO[bt] || [bt] }
+            saveRecords(records);
+        }
+        function addNextPeriodRecord(nextExpect, kill, threeDoor, finalBet, randId) {
+            let records = loadRecords();
+            if (records.some(r => r.expect === nextExpect)) return;
+            records.push({ expect: nextExpect, status: 'pending', kill, threeDoor, finalBet, randId });
+            if (records.length > 50) records.shift();
+            saveRecords(records);
+        }
+        function renderHistory() {
+            const tbody = $('historyBody');
+            const records = loadRecords().reverse();
+            if (!records.length) { tbody.innerHTML = '<tr><td colspan="8">暂无记录</td></tr>'; return; }
+            tbody.innerHTML = records.slice(0,30).map(r => {
+                const kc = r.status==='pending'?'⏳':(r.killCorrect?'✓':'✗');
+                const pc = r.status==='pending'?'⏳':(r.poolCorrect?'✓':'✗');
+                const finalCount = r.finalBet?.length || 0;
+                return `<tr>
+                    <td>${r.expect}</td>
+                    <td>${r.status==='verified'?r.nums.join('+')+'='+r.sum:'待开奖'}</td>
+                    <td>${r.kill}</td>
+                    <td>${(r.finalBet||[]).join(' ')}</td>
+                    <td>${finalCount===2?'双组':'三组'}</td>
+                    <td>R${r.randId ?? '-'}</td>
+                    <td class="${r.killCorrect?'badge-green':'badge-red'}">${kc}</td>
+                    <td class="${r.poolCorrect?'badge-green':'badge-red'}">${pc}</td>
+                </tr>`;
+            }).join('');
+        }
+        function showCopySuccess() { const btn = $('copyBtn'); btn.classList.add('success'); btn.innerHTML = '✓'; setTimeout(() => { btn.classList.remove('success'); btn.innerHTML = '📋'; }, 1500); }
+        function fallbackCopy(text) { const textarea = document.createElement('textarea'); textarea.value = text; document.body.appendChild(textarea); textarea.select(); try { document.execCommand('copy'); showCopySuccess(); } catch(e) { alert('复制失败'); } document.body.removeChild(textarea); }
+        let history = [], latestDrawTime = null, isRequesting = false, countdownTimer = null;
+        function updateUI() {
+            if (!history.length) return;
+            const latest = history[0];
+            latestDrawTime = latest.opentime ? new Date(latest.opentime) : null;
+            verifyOpenedRecord(latest);
+            const bestId = getBestRandId(history);
+            const R = getRandByIndex(latest.expect, latest.nums, latest.sum, bestId);
+            const formulaType = getFormulaType(bestId);
+            const threeDoor = getThreeDoorByFormula(R, latest.sum, formulaType);
+            const kill = calcHexKill(history);
+            const finalBet = threeDoor.includes(kill) ? threeDoor.filter(t => t !== kill) : threeDoor;
+            const nextExpect = String(parseInt(latest.expect) + 1);
+            addNextPeriodRecord(nextExpect, kill, threeDoor, finalBet, bestId);
+            const balls = [$('ball1'), $('ball2'), $('ball3')];
+            balls.forEach((ball, i) => { ball.textContent = latest.nums[i]; });
+            $('latestPeriod').textContent = latest.expect;
+            $('latestSum').textContent = latest.sum;
+            $('latestType').textContent = latest.type;
+            $('killText').textContent = kill;
+            $('poolText').textContent = threeDoor.join('');
+            $('betText').textContent = finalBet.join('');
+            $('randId').textContent = `R${bestId}`;
+            const format = $('formatSelect').value;
+            $('recordText').value = generateRecordText(kill, threeDoor, finalBet, format, nextExpect);
+            $('specialCodesContainer').innerHTML = generateSpecials(finalBet).map(c => `<div class="dock-pill">${c}</div>`).join('');
+            renderHistory();
+            startCountdown();
+        }
+        function startCountdown() {
+            if (countdownTimer) clearInterval(countdownTimer);
+            if (!latestDrawTime) { $('countdownText').textContent = '--:--'; return; }
+            const tick = () => {
+                const diff = Math.max(0, Math.floor((latestDrawTime.getTime() + DRAW_PERIOD*1000 - Date.now())/1000));
+                $('countdownText').textContent = `${String(Math.floor(diff/60)).padStart(2,'0')}:${String(diff%60).padStart(2,'0')}`;
+                if (diff <= 0) { clearInterval(countdownTimer); fetchDataFastest(); }
+            };
+            tick(); countdownTimer = setInterval(tick, 200);
+        }
+        function robustParseOpentime(opentime) {
+            const ts = Number(opentime);
+            if (!ts || isNaN(ts)) return Date.now();
+            return ts < 1e12 ? ts * 1000 : ts;
+        }
+        async function fetchDataFastest() {
+            if (isRequesting) return;
+            isRequesting = true;
+            const apiList = [
+                { url: 'https://pc28.help/api/kj.json?nbr=50', parser: (json) => { if (!json.data || !json.data.length) return []; return json.data.map(item => { const nums = item.number.split('+').map(Number); const opentime = new Date((item.date||'')+' '+(item.time||'')).getTime(); return { expect: String(item.nbr), nums, sum: parseInt(item.num,10), type: item.combination || getTypeFromSum(parseInt(item.num,10)), opentime: isNaN(opentime) ? Date.now() : opentime }; }); } },
+                { url: 'https://super.pc28998.com/history/JND28', parser: (json) => { if (json.code !== 1 || !json.data) return []; return json.data.map(item => ({ expect: String(item.expect), nums: item.opencode.split(',').map(Number), sum: item.opencode.split(',').map(Number).reduce((a,b)=>a+b,0), type: getTypeFromSum(item.opencode.split(',').map(Number).reduce((a,b)=>a+b,0)), opentime: item.opentime })); } },
+                { url: 'https://api.kj28.top/api', parser: (json) => { if (!json.data || !json.data.length) return []; return json.data.map(item => { const nums = item.opennum.split('+').map(Number); return { expect: String(item.qihao), nums, sum: parseInt(item.sum,10), type: getTypeFromSum(parseInt(item.sum,10)), opentime: item.opentime || item.opentimestamp }; }); } }
             ];
-
-            function calcBaseType(history3) {
-                if (!history3 || history3.length < 3) return '--';
-                const totalSum = history3[0].sum + history3[1].sum + history3[2].sum;
-                const result = (totalSum / 27) / Math.E;
-                const decimalStr = result.toString().split('.')[1] || '';
-                const firstThree = decimalStr.slice(0, 3).padEnd(3, '0');
-                const baseSum = parseInt(firstThree[0]) + parseInt(firstThree[1]) + parseInt(firstThree[2]);
-                return getTypeFromSum(baseSum);
-            }
-
-            function calcTableAccuracy(tableFn, history, testCount) {
-                if (history.length < 4) return 0;
-                let correct = 0,
-                    total = 0;
-                const max = Math.min(testCount, history.length - 3);
-                for (let i = 0; i < max; i++) {
-                    const cur = history[i];
-                    const hist3 = [history[i + 1], history[i + 2], history[i + 3]];
-                    const baseType = calcBaseType(hist3);
-                    if (baseType === '--') continue;
-                    const pred = tableFn(baseType);
-                    if (pred && pred.includes(cur.type)) correct++;
-                    total++;
-                }
-                return total > 0 ? (correct / total) * 100 : 0;
-            }
-
-            function selectBestTable(historyData) {
-                if (historyData.length < 4) return TABLES[1].fn;
-                let candidates = TABLES.map(t => ({ table: t, acc50: calcTableAccuracy(t.fn, historyData, 50) }));
-                candidates.sort((a, b) => b.acc50 - a.acc50);
-                candidates = candidates.slice(0, 2);
-                candidates = candidates.map(item => ({ ...item, acc27: calcTableAccuracy(item.table.fn, historyData,
-                        27) }));
-                candidates.sort((a, b) => b.acc27 - a.acc27);
-                candidates = candidates.slice(0, 1);
-                candidates = candidates.map(item => ({ ...item, acc10: calcTableAccuracy(item.table.fn, historyData,
-                        10) }));
-                candidates.sort((a, b) => b.acc10 - a.acc10);
-                return candidates[0].table.fn;
-            }
-
-            function getThreeDoor(history) {
-                if (history.length < 3) return ['--', '--', '--'];
-                const bestFn = selectBestTable(history);
-                const baseType = calcBaseType([history[0], history[1], history[2]]);
-                if (baseType === '--') return ['--', '--', '--'];
-                return bestFn(baseType) || ['--', '--', '--'];
-            }
-
-            // ========== 特码 ==========
-            function generateSpecials(finalBet) {
-                if (!finalBet || finalBet.length === 0) return [];
-                let selected = new Set();
-                for (let rec of finalBet) {
-                    for (let nums of Object.values(MOON_EYE_GROUPS)) {
-                        for (let num of nums)
-                            if (getTypeFromSum(num) === rec) selected.add(num);
-                    }
-                }
-                let specials = Array.from(selected).sort((a, b) => a - b);
-                const maxCount = finalBet.length === 2 ? 4 : 6;
-                specials = specials.slice(0, maxCount);
-                while (specials.length < maxCount) {
-                    let all = Object.values(MOON_EYE_GROUPS).flat();
-                    for (let n of all)
-                        if (!specials.includes(n)) { specials.push(n); if (specials.length >= maxCount) break; }
-                }
-                return specials.map(n => String(n).padStart(2, '0'));
-            }
-
-            function generateRecordText(kill, finalBet, format, expect) {
-                const cleanKill = kill;
-                const finalStr = finalBet.join('');
-                switch (format) {
-                    case '1':
-                        return `杀${cleanKill}/${finalStr}/13/14`;
-                    case '2':
-                        return finalBet.length === 2 ? `${finalBet.join('/')}13/14` : `${finalStr}13/14`;
-                    case '3':
-                        return `${expect || '----'}/杀${cleanKill}🉐${finalStr}13/14`;
-                    default:
-                        return `杀${cleanKill}🉐${finalStr} 13/14`;
-                }
-            }
-
-            function loadRecords() { try { return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]'); } catch (e) { return []; } }
-
-            function saveRecords(records) { localStorage.setItem(STORAGE_KEY, JSON.stringify(records)); }
-
-            function verifyOpenedRecord(latestDraw) {
-                let records = loadRecords();
-                const idx = records.findIndex(r => r.expect === latestDraw.expect && r.status === 'pending');
-                if (idx === -1) return;
-                const rec = records[idx];
-                const is13or14 = (latestDraw.sum === 13 || latestDraw.sum === 14);
-                records[idx] = {
-                    ...rec,
-                    status: 'verified',
-                    nums: latestDraw.nums,
-                    sum: latestDraw.sum,
-                    type: latestDraw.type,
-                    killCorrect: is13or14 ? true : (rec.kill !== latestDraw.type),
-                    poolCorrect: is13or14 ? true : rec.finalBet.includes(latestDraw.type)
-                };
-                saveRecords(records);
-            }
-
-            function addNextPeriodRecord(nextExpect, kill, finalBet) {
-                let records = loadRecords();
-                if (records.some(r => r.expect === nextExpect)) return;
-                records.push({ expect: nextExpect, status: 'pending', kill, finalBet });
-                if (records.length > 50) records.shift();
-                saveRecords(records);
-            }
-
-            function renderHistory() {
-                const tbody = $('historyBody');
-                const records = loadRecords().reverse();
-                if (!records.length) { tbody.innerHTML = '<tr><td colspan="7">暂无记录</td></tr>'; return; }
-                tbody.innerHTML = records.slice(0, 30).map(r => {
-                    const kc = r.status === 'pending' ? '⏳' : (r.killCorrect ? '✓' : '✗');
-                    const pc = r.status === 'pending' ? '⏳' : (r.poolCorrect ? '✓' : '✗');
-                    const finalCount = r.finalBet?.length || 0;
-                    return `<tr><td>${r.expect}</td><td>${r.status === 'verified' ? r.nums.join('+') + '=' + r.sum :
-                        '待开奖'}</td><td>${r.kill}</td><td>${(r.finalBet || []).join(' ')}</td><td>${finalCount === 2 ?
-                        '双组' : '三组'}</td><td class="${r.killCorrect ? 'badge-green' : 'badge-red'}">${kc}</td><td class="${r
-                        .poolCorrect ? 'badge-green' : 'badge-red'}">${pc}</td></tr>`;
-                }).join('');
-            }
-
-            function showCopySuccess() {
-                const btn = $('copyBtn');
-                btn.classList.add('success');
-                btn.innerHTML = '✅';
-                setTimeout(() => { btn.classList.remove('success');
-                    btn.innerHTML = '📋'; }, 1500);
-            }
-
-            function fallbackCopy(text) {
-                const textarea = document.createElement('textarea');
-                textarea.value = text;
-                document.body.appendChild(textarea);
-                textarea.select();
-                try { document.execCommand('copy');
-                    showCopySuccess(); } catch (e) { alert('复制失败'); }
-                document.body.removeChild(textarea);
-            }
-
-            function initCopyEvent() {
-                $('copyBtn').addEventListener('click', () => {
-                    const val = $('recordText').value.trim();
-                    if (!val || val === '等待数据加载...') return;
-                    if (navigator.clipboard && window.isSecureContext) {
-                        navigator.clipboard.writeText(val).then(showCopySuccess).catch(() => fallbackCopy(val));
-                    } else fallbackCopy(val);
-                });
-            }
-
-            let history = [],
-                latestDrawTime = null,
-                isRequesting = false,
-                countdownTimer = null;
-
-            function updateUI() {
-                if (!history.length) return;
-                const latest = history[0];
-                latestDrawTime = latest.opentime ? new Date(latest.opentime) : null;
-                verifyOpenedRecord(latest);
-
-                const jtThree = getJingTianThree(history);
-                const kill = getKillFromJingTian(jtThree);
-                const threeDoor = getThreeDoor(history);
-                const finalBet = threeDoor.includes(kill) ? threeDoor.filter(t => t !== kill) : threeDoor;
-                const nextExpect = String(parseInt(latest.expect) + 1);
-                addNextPeriodRecord(nextExpect, kill, finalBet);
-
-                $('ball1').textContent = latest.nums[0];
-                $('ball2').textContent = latest.nums[1];
-                $('ball3').textContent = latest.nums[2];
-                $('latestPeriod').textContent = latest.expect + '期';
-                $('latestSum').textContent = '和值 ' + latest.sum + ' / ' + latest.type;
-                $('killText').textContent = kill;
-                $('poolText').textContent = threeDoor.join(' · ');
-                $('betText').textContent = finalBet.join(' · ');
-                const format = $('formatSelect').value;
-                $('recordText').value = generateRecordText(kill, finalBet, format, nextExpect);
-                $('specialCodesContainer').innerHTML = generateSpecials(finalBet).map(c =>
-                    `<span style="background:#fff;padding:8px 14px;border-radius:16px;font-weight:700;">${c}</span>`).join('');
-                renderHistory();
-                startCountdown();
-            }
-
-            function startCountdown() {
-                if (countdownTimer) clearInterval(countdownTimer);
-                if (!latestDrawTime) { $('countdownText').textContent = '--:--'; return; }
-                const tick = () => {
-                    const diff = Math.max(0, Math.floor((latestDrawTime.getTime() + DRAW_PERIOD * 1000 - Date.now()) /
-                        1000));
-                    $('countdownText').textContent = String(Math.floor(diff / 60)).padStart(2, '0') + ':' + String(diff % 60)
-                        .padStart(2, '0');
-                    const circle = $('countdownCircle');
-                    if (circle) circle.style.strokeDashoffset = 213.6 * (1 - diff / DRAW_PERIOD);
-                    if (diff <= 0) { clearInterval(countdownTimer);
-                        fetchData(); }
-                };
-                tick();
-                countdownTimer = setInterval(tick, 200);
-            }
-
-            function robustParseNums(opencode) {
-                if (!opencode) return [0, 0, 0];
-                const parts = opencode.split(/[,+\s]+/);
-                let nums = parts.map(n => parseInt(n)).filter(n => !isNaN(n));
-                while (nums.length < 3) nums.push(0);
-                return nums.slice(0, 3);
-            }
-
-            function robustParseOpentime(opentime) {
-                const ts = Number(opentime);
-                if (!ts || isNaN(ts)) return Date.now();
-                return ts < 1e12 ? ts * 1000 : ts;
-            }
-
-            async function fetchData() {
-                if (isRequesting) return;
-                isRequesting = true;
-                const btn = $('refreshBtn'); if (btn) btn.classList.add('loading');
-                try {
-                    let data = null;
-                    try { const resp = await fetch(API_URL, { signal: AbortSignal.timeout(4000) }); if (resp.ok) data =
-                            await resp.json(); } catch (e) {}
-                    if (!data) { for (const proxy of CORS_PROXIES) { try { const resp = await fetch(proxy.url +
-                                encodeURIComponent(API_URL)); if (resp.ok) { data = await resp.json(); break; } } catch (
-                            e) { continue; } } }
-                    let list = [];
-                    if (data && data.data && Array.isArray(data.data)) list = data.data;
-                    else if (Array.isArray(data)) list = data;
-                    else if (data && typeof data === 'object') list = Object.values(data).filter(item => item && (item
-                        .expect || item.qihao || item.nbr));
-                    if (list.length) {
-                        history = list.map(item => {
-                            const nums = robustParseNums(item.opencode);
-                            const sum = item.sum ?? nums.reduce((a, b) => a + b, 0);
-                            const opentime = robustParseOpentime(item.opentime);
-                            return { expect: item.expect || '', nums, sum, type: getTypeFromSum(sum), opentime };
-                        }).filter(item => item.sum >= 0 && item.sum <= 27).sort((a, b) => parseInt(b.expect) - parseInt(a
-                            .expect));
-                        trainMLP(history);
-                        updateUI();
-                    }
-                } catch (e) { console.warn(e); } finally { isRequesting = false; if (btn) btn.classList.remove(
-                    'loading'); }
-            }
-
-            function initApp() {
-                initCopyEvent();
-                $('refreshBtn').addEventListener('click', fetchData);
-                $('clearHistoryBtn').addEventListener('click', () => { localStorage.removeItem(STORAGE_KEY);
-                    renderHistory(); });
-                $('formatSelect').addEventListener('change', function() {
-                    if (history.length) {
-                        const kill = getKillFromJingTian(getJingTianThree(history));
-                        const threeDoor = getThreeDoor(history);
-                        const finalBet = threeDoor.includes(kill) ? threeDoor.filter(t => t !== kill) : threeDoor;
-                        $('recordText').value = generateRecordText(kill, finalBet, this.value, String(parseInt(history[0]
-                            .expect) + 1));
-                    }
-                });
-                fetchData();
-                setInterval(fetchData, 20000);
-            }
-        })();
+            const requests = apiList.map(async (api) => { try { const resp = await fetch(api.url, { signal: AbortSignal.timeout(3000) }); if (!resp.ok) throw new Error('bad'); const json = await resp.json(); const parsed = api.parser(json); return (parsed && parsed.length > 0) ? parsed : null; } catch(e) { return null; } });
+            const results = await Promise.all(requests);
+            let winningData = null;
+            for (const data of results) { if (data) { winningData = data; break; } }
+            if (!winningData) { try { const proxyResp = await fetch('https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent('https://super.pc28998.com/history/JND28'), { signal: AbortSignal.timeout(5000) }); if (proxyResp.ok) { const json = await proxyResp.json(); if (json.code === 1 && json.data) { winningData = json.data.map(item => ({ expect: String(item.expect), nums: item.opencode.split(',').map(Number), sum: item.opencode.split(',').map(Number).reduce((a,b)=>a+b,0), type: getTypeFromSum(item.opencode.split(',').map(Number).reduce((a,b)=>a+b,0)), opentime: item.opentime })); } } } catch(e) {} }
+            if (winningData) { history = winningData.map(item => ({ ...item, type: item.type || getTypeFromSum(item.sum), opentime: robustParseOpentime(item.opentime) })).filter(item => item.sum >= 0 && item.sum <= 27).sort((a,b) => parseInt(b.expect) - parseInt(a.expect)); updateUI(); }
+            isRequesting = false;
+        }
+        function initApp() {
+            const splash = $('splashScreen'), progressFill = $('progressFill'), progressText = $('progressText');
+            let progress = 0, splashDismissed = false;
+            const progressTimer = setInterval(() => { if (splashDismissed) { clearInterval(progressTimer); return; } progress += Math.random() * 8 + 2; if (progress >= 100) { progress = 100; progressFill.style.width = '100%'; progressText.textContent = '加载完成，点击进入'; clearInterval(progressTimer); } else { progressFill.style.width = progress + '%'; } }, 120);
+            fetchDataFastest().then(() => { if (progress >= 90 && !splashDismissed) { progress = 100; progressFill.style.width = '100%'; progressText.textContent = '加载完成，点击进入'; clearInterval(progressTimer); } });
+            splash.addEventListener('click', () => { if (splashDismissed) return; splashDismissed = true; clearInterval(progressTimer); progressFill.style.width = '100%'; progressText.textContent = '加载完成，点击进入'; setTimeout(() => { splash.classList.add('hidden'); setTimeout(() => { splash.style.display = 'none'; }, 500); setInterval(() => { if (!isRequesting) fetchDataFastest(); }, 10000); }, 300); });
+            $('copyBtn').addEventListener('click', () => { const val = $('recordText').value.trim(); if (!val || val === '等待数据加载...') return; if (navigator.clipboard && window.isSecureContext) { navigator.clipboard.writeText(val).then(showCopySuccess).catch(() => fallbackCopy(val)); } else fallbackCopy(val); });
+            $('formatSelect').addEventListener('change', function() { if (history.length) { const bestId = getBestRandId(history); const R = getRandByIndex(history[0].expect, history[0].nums, history[0].sum, bestId); const threeDoor = getThreeDoorByFormula(R, history[0].sum, getFormulaType(bestId)); const kill = calcHexKill(history); const finalBet = threeDoor.includes(kill) ? threeDoor.filter(t => t !== kill) : threeDoor; $('recordText').value = generateRecordText(kill, threeDoor, finalBet, this.value, String(parseInt(history[0].expect)+1)); } });
+            $('historyTrigger').addEventListener('click', () => { $('historyPanel').classList.add('open'); });
+            $('historyClose').addEventListener('click', () => { $('historyPanel').classList.remove('open'); });
+        }
+        if (document.readyState === 'loading') { document.addEventListener('DOMContentLoaded', initApp); } else { initApp(); }
     </script>
 </body>
 </html>
